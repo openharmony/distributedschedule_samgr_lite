@@ -193,7 +193,7 @@ static void InitializeAllServices(Vector *services)
         const char *name = serviceImpl->service->GetName(serviceImpl->service);
         AddTaskPool(serviceImpl, &config, name);
 
-        HILOG_INFO(HILOG_MODULE_SAMGR, "Init service:%s TaskPool:%p", name, serviceImpl->taskPool);
+        HILOG_INFO(HILOG_MODULE_SAMGR, "Init service:%s", name);
         InitializeSingleService(serviceImpl);
     }
     SamgrLiteImpl *samgr = GetImplement();
@@ -447,7 +447,7 @@ static void AddTaskPool(ServiceImpl *service, TaskConfig *cfg, const char *name)
             }
             service->taskPool = samgr->sharedPool[pos];
             if (SAMGR_ReferenceTaskPool(service->taskPool) == NULL) {
-                HILOG_ERROR(HILOG_MODULE_SAMGR, "shared task:%p pri:%d ref is full", service->taskPool, cfg->priority);
+                HILOG_ERROR(HILOG_MODULE_SAMGR, "pri:%d ref is full", cfg->priority);
                 samgr->sharedPool[pos] = NULL;
             }
         }
@@ -501,8 +501,8 @@ static void HandleInitRequest(const Request *request, const Response *response)
 {
     ServiceImpl *serviceImpl = (ServiceImpl *)request->data;
     if (serviceImpl == NULL) {
-        HILOG_ERROR(HILOG_MODULE_SAMGR, "Init service Request:<%d,%d>, Response:<%p,%d>!",
-                    request->msgId, request->msgValue, response->data, response->len);
+        HILOG_ERROR(HILOG_MODULE_SAMGR, "Init service Request:<%d,%d>, Response:<%d>!",
+            request->msgId, request->msgValue, response->len);
         return;
     }
     uint32 lastTime = serviceImpl->ops.timestamp;
