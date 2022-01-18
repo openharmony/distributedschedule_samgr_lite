@@ -27,6 +27,7 @@ shared_library("server") {
     "//third_party/bounds_checking_function/include",
     "//base/security/permission/interfaces/innerkits/permission_lite",
     "//base/security/permission/services/permission_lite/pms_base/include",
+    "//foundation/communication/ipc_lite/frameworks/liteipc/include",
   ]
 
   deps = [ "//foundation/distributedschedule/samgr_lite:ConfigFiles" ]

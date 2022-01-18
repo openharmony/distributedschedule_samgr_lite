@@ -20,6 +20,7 @@
 #include <ohos_init.h>
 #include <ohos_types.h>
 #include <ohos_errno.h>
+#include <liteipc.h>
 #include <liteipc_adapter.h>
 #include <log.h>
 #include "cJSON.h"
@@ -167,6 +168,12 @@ static int ProcEndpoint(SamgrServer *server, int32 option, void *origin, IpcIo *
         SvcIdentity identity = {(uint32)INVALID_INDEX, (uint32)INVALID_INDEX, (uint32)INVALID_INDEX};
         (void)GenServiceHandle(&identity, GetCallingTid(origin));
 #ifdef __LINUX__
+        IpcMsg* data = (IpcMsg*)origin;
+        if (data == NULL) {
+            HILOG_ERROR(HILOG_MODULE_SAMGR, "Register Endpoint origin null pointer!");
+            return EC_FAILURE;
+        }
+        identity.handle = data->target.handle;
         BinderAcquire(g_server.samgr->context, identity.handle);
 #endif
 
