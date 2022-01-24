@@ -17,10 +17,19 @@
         "adapted_system_type": [
             "small"
         ],
-        "rom": "",
+        "adapted_kernel": [
+            "liteos_a",
+            "liteos_m",
+            "linux"
+        ],
+        "rom": "62KB",
         "ram": "",
         "deps": {
-            "components": [],
+            "components": [
+                "utils_base",
+                "ipc_lite",
+                "hilog_lite"
+            ],
             "third_party": [
                 "bounds_checking_function",
                 "cJSON"
@@ -28,46 +37,7 @@
         },
         "build": {
             "sub_component": [
-                "//foundation/distributedschedule/samgr_lite/communication/broadcast:broadcast",
-                "//foundation/distributedschedule/samgr_lite/samgr:samgr",
-                "//foundation/distributedschedule/samgr_lite/samgr_server:server"
-            ],
-            "inner_kits": [
-                {
-                    "header": {
-                        "header_base": "foundation/distributedschedule/samgr_lite/interfaces/kits/",
-                        "header_files": [
-                            "registry/iproxy_client.h",
-                            "registry/iproxy_server.h",
-                            "registry/registry.h",
-                            "samgr/common.h",
-                            "samgr/feature.h",
-                            "samgr/iunknown.h",
-                            "samgr/message.h",
-                            "samgr/samgr_lite.h",
-                            "samgr/service.h"
-                        ]
-                    },
-                    "name": "//foundation/distributedschedule/samgr_lite/samgr:samgr"
-                },
-                {
-                    "header": {
-                        "header_base": "foundation/distributedschedule/samgr_lite/samgr_server/source/",
-                        "header_files": [
-                            "samgr_server.h"
-                        ]
-                    },
-                    "name": "//foundation/distributedschedule/samgr_lite/samgr_server:server"
-                },
-                {
-                    "header": {
-                        "header_base": "foundation/distributedschedule/samgr_lite/interfaces/kits/communication/broadcast/",
-                        "header_files": [
-                            "broadcast_interface.h"
-                        ]
-                    },
-                    "name": "//foundation/distributedschedule/samgr_lite/communication/broadcast:broadcast"
-                }
+                "//foundation/distributedschedule/samgr_lite:samgr"
             ]
         }
     }
