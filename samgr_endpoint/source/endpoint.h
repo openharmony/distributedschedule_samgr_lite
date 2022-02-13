@@ -55,10 +55,18 @@ typedef enum OptionID {
     OP_ALL,
 } OptionID;
 typedef struct Endpoint Endpoint;
+
+#ifndef MINI_SAMGR_LITE_RPC
 typedef int (*RegisterEndpoint)(const IpcContext *context, SvcIdentity *identity);
+#else
+typedef int (*RegisterEndpoint)(SvcIdentity *identity, int token, const char *service, const char *feature);
+#endif
+
 struct Endpoint {
     const char *name;
+#ifndef MINI_SAMGR_LITE_RPC
     IpcContext *context;
+#endif
     Vector routers;
     ThreadId boss;
     uint32 deadId;

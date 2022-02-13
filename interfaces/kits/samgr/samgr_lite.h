@@ -230,7 +230,9 @@ typedef struct SamgrLite {
      * @version 1.0
      */
     IUnknown *(*GetDefaultFeatureApi)(const char *service);
-
+#ifdef MINI_SAMGR_LITE_RPC
+    IUnknown *(*GetRemoteDefaultFeatureApi)(char *deviceId, const char *serviceName);
+#endif
     /**
      * @brief Obtains the API specific to the feature.
      *

@@ -11,6 +11,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("../../config.gni")
+
 config("samgr_source_public") {
   include_dirs = [
     "../adapter",
@@ -39,7 +41,14 @@ if (ohos_kernel_type == "liteos_m") {
       "//foundation/distributedschedule/samgr_lite/samgr/adapter:samgr_adapter",
     ]
 
-    include_dirs = [ "//base/hiviewdfx/hilog_lite/interfaces/native/kits/hilog_lite" ]
+    include_dirs =
+        [ "//base/hiviewdfx/hilog_lite/interfaces/native/kits/hilog_lite" ]
+
+    if (enable_ohos_distributedschedule_samgr_lite_rpc_mini) {
+      public_deps += [
+        "//foundation/communication/ipc/interfaces/innerkits/c/dbinder:dbinder",
+      ]
+    }
   }
 }
 
@@ -66,8 +75,6 @@ if (ohos_kernel_type == "liteos_a" || ohos_kernel_type == "linux") {
       "//foundation/distributedschedule/samgr_lite/samgr/adapter:samgr_adapter",
     ]
 
-    include_dirs = [
-      "//third_party/bounds_checking_function/include",
-    ]
+    include_dirs = [ "//third_party/bounds_checking_function/include" ]
   }
 }

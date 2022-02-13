@@ -45,6 +45,9 @@ static IUnknown *GetFeatureApi(const char *serviceName, const char *feature);
 static int32 AddSystemCapability(const char *sysCap);
 static BOOL HasSystemCapability(const char *sysCap);
 static int32 GetSystemAvailableCapabilities(char sysCaps[MAX_SYSCAP_NUM][MAX_SYSCAP_NAME_LEN], int32 *size);
+#ifdef MINI_SAMGR_LITE_RPC
+static IUnknown *GetRemoteDefaultFeatureApi(char *deviceId, const char *serviceName);
+#endif
 /* **************************************************************************************************
  * Samgr Lite location functions
  * ************************************************************************************************* */
@@ -93,6 +96,9 @@ static void Init(void)
     g_samgrImpl.vtbl.UnregisterDefaultFeatureApi = UnregisterDefaultFeatureApi;
     g_samgrImpl.vtbl.GetDefaultFeatureApi = GetDefaultFeatureApi;
     g_samgrImpl.vtbl.GetFeatureApi = GetFeatureApi;
+#ifdef MINI_SAMGR_LITE_RPC
+    g_samgrImpl.vtbl.GetRemoteDefaultFeatureApi = GetRemoteDefaultFeatureApi;
+#endif
     g_samgrImpl.vtbl.AddSystemCapability = AddSystemCapability;
     g_samgrImpl.vtbl.HasSystemCapability = HasSystemCapability;
     g_samgrImpl.vtbl.GetSystemAvailableCapabilities = GetSystemAvailableCapabilities;
@@ -563,3 +569,10 @@ static TaskPool *GetSpecifiedTaskPool(TaskConfig *config)
     MUTEX_Unlock(samgr->mutex);
     return NULL;
 }
+
+#ifdef MINI_SAMGR_LITE_RPC
+static IUnknown *GetRemoteDefaultFeatureApi(char *deviceId, const char *serviceName)
+{
+    return SAMGR_CreateIRemoteProxy(deviceId, serviceName, NULL);
+}
+#endif

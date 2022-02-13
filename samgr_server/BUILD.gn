@@ -11,31 +11,65 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-shared_library("server") {
-  sources = [ "source/samgr_server.c" ]
+import("../config.gni")
 
-  cflags = [
-    "-fPIC",
-    "-Wall",
-  ]
+if (!enable_ohos_distributedschedule_samgr_lite_rpc_mini) {
+  shared_library("server") {
+    sources = [ "source/samgr_server.c" ]
 
-  include_dirs = [
-    "../samgr_endpoint/source",
-    "//foundation/distributedschedule/samgr_lite/interfaces/kits/samgr",
-    "//foundation/distributedschedule/samgr_lite/interfaces/kits/registry",
-    "//utils/native/lite/include",
-    "//third_party/bounds_checking_function/include",
-    "//base/security/permission/interfaces/innerkits/permission_lite",
-    "//base/security/permission/services/permission_lite/pms_base/include",
-    "//foundation/communication/ipc_lite/frameworks/liteipc/include",
-  ]
+    cflags = [
+      "-fPIC",
+      "-Wall",
+    ]
 
-  deps = [ "//foundation/distributedschedule/samgr_lite:ConfigFiles" ]
+    include_dirs = [
+      "../samgr_endpoint/source",
+      "//foundation/distributedschedule/samgr_lite/interfaces/kits/samgr",
+      "//foundation/distributedschedule/samgr_lite/interfaces/kits/registry",
+      "//utils/native/lite/include",
+      "//third_party/bounds_checking_function/include",
+      "//base/security/permission/interfaces/innerkits/permission_lite",
+      "//base/security/permission/services/permission_lite/pms_base/include",
+      "//foundation/communication/ipc_lite/frameworks/liteipc/include",
+    ]
 
-  public_deps = [
-    "//foundation/communication/ipc_lite:liteipc_adapter",
-    "//foundation/distributedschedule/samgr_lite/samgr:samgr",
-    "//foundation/distributedschedule/samgr_lite/samgr_endpoint:store_source",
-    "//third_party/bounds_checking_function:libsec_shared",
-  ]
+    deps = [ "//foundation/distributedschedule/samgr_lite:ConfigFiles" ]
+
+    public_deps = [
+      "//foundation/communication/ipc_lite:liteipc_adapter",
+      "//foundation/distributedschedule/samgr_lite/samgr:samgr",
+      "//foundation/distributedschedule/samgr_lite/samgr_endpoint:store_source",
+      "//third_party/bounds_checking_function:libsec_shared",
+    ]
+  }
+} else {
+  if (ohos_kernel_type == "liteos_m") {
+    static_library("server") {
+      defines = [ "MINI_SAMGR_LITE_RPC" ]
+      sources = [ "source/samgr_server_rpc.c" ]
+
+      cflags = [ "-Wall" ]
+
+      include_dirs = [
+        "../samgr_endpoint/source",
+        "//foundation/distributedschedule/samgr_lite/interfaces/kits/samgr",
+        "//foundation/distributedschedule/samgr_lite/interfaces/kits/registry",
+        "//utils/native/lite/include",
+        "//third_party/bounds_checking_function/include",
+        "//third_party/cJSON",
+        "//base/security/permission/interfaces/innerkits/permission_lite",
+        "//base/security/permission/services/permission_lite/pms_base/include",
+      ]
+
+      deps = [ "//foundation/distributedschedule/samgr_lite:ConfigFiles" ]
+
+      public_deps = [
+        "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_static",
+        "//foundation/communication/ipc/interfaces/innerkits/c/dbinder:dbinder",
+        "//foundation/distributedschedule/samgr_lite/samgr:samgr",
+        "//foundation/distributedschedule/samgr_lite/samgr_endpoint:store_source",
+        "//third_party/bounds_checking_function:libsec_static",
+      ]
+    }
+  }
 }

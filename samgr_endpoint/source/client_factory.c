@@ -109,7 +109,7 @@ static Factory *GetFactory(const char *service, const char *feature)
     SaName key = {service, feature};
     Factory *factory = NULL;
     MUTEX_Lock(g_mutex);
-    int index = VECTOR_FindByKey(&g_factories, &key);
+    int16 index = VECTOR_FindByKey(&g_factories, &key);
     if (index != INVALID_INDEX) {
         factory = VECTOR_At(&g_factories, index);
     }

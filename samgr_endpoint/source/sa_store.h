@@ -16,7 +16,13 @@
 #define LITE_SA_STORE_H
 
 #include <ohos_types.h>
+
+#ifndef MINI_SAMGR_LITE_RPC
 #include <liteipc_adapter.h>
+#else
+#include <serializer.h>
+#include <unistd.h>
+#endif
 
 #ifdef __cplusplus
 #if __cplusplus
@@ -33,6 +39,9 @@ typedef struct PidHandle PidHandle;
 struct ServiceInfo {
     char name[MAX_NAME_LEN];
     uint32 handle;
+#ifdef MINI_SAMGR_LITE_RPC
+    uintptr_t cookie;
+#endif
     FeatureNode *head;
 };
 

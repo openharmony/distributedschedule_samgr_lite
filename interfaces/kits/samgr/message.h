@@ -116,6 +116,9 @@ struct Response {
     void *data;
     /** Data length */
     int16 len;
+#ifdef MINI_SAMGR_LITE_RPC
+    void *reply;
+#endif
 };
 #pragma pack()
 

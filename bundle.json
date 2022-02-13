@@ -27,7 +27,6 @@
         "deps": {
             "components": [
                 "utils_base",
-                "ipc_lite",
                 "hilog_lite"
             ],
             "third_party": [

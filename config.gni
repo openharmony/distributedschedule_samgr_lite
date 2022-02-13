@@ -15,4 +15,7 @@ declare_args() {
   # configuration for samgr_lite created shared task's stack size.
   # 0 means using system default thread stack size, other positive values will be accepted.
   config_ohos_distributedschedule_samgr_lite_shared_task_size = 2048
+
+  # enable samgr_lite adapt to rpc on mini system.
+  enable_ohos_distributedschedule_samgr_lite_rpc_mini = false
 }

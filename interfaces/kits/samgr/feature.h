@@ -129,11 +129,24 @@ struct Feature {
  * This macro provides the capability of inheriting the feature lifecycle. \n
  *
  */
+#ifndef MINI_SAMGR_LITE_RPC
+
 #define INHERIT_FEATURE                                                         \
     const char *(*GetName)(Feature *feature);                                   \
     void (*OnInitialize)(Feature *feature, Service *parent, Identity identity); \
     void (*OnStop)(Feature *feature, Identity identity);                        \
     BOOL (*OnMessage)(Feature *feature, Request *request)
+
+#else
+
+#define INHERIT_FEATURE                                                         \
+    const char *(*GetName)(Feature *feature);                                   \
+    void (*OnInitialize)(Feature *feature, Service *parent, Identity identity); \
+    void (*OnStop)(Feature *feature, Identity identity);                        \
+    BOOL (*OnMessage)(Feature *feature, Request *request);                      \
+    BOOL (*IsDistributed)(void)
+
+#endif
 
 #ifdef __cplusplus
 #if __cplusplus

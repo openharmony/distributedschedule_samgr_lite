@@ -50,9 +50,7 @@ if (ohos_kernel_type == "liteos_a" || ohos_kernel_type == "linux") {
 
     public_configs = [ ":samgr_adapter_public" ]
 
-    include_dirs = [
-      "//third_party/bounds_checking_function/include",
-    ]
+    include_dirs = [ "//third_party/bounds_checking_function/include" ]
 
     cflags = [
       "-fPIC",

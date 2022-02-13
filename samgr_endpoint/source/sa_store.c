@@ -18,6 +18,10 @@
 #include "common.h"
 #include "memory_adapter.h"
 
+#ifdef MINI_SAMGR_LITE_RPC
+#include "samgr_server.h"
+#endif
+
 #define GROW_STEP 4
 #define MAX_SA_NUM 300
 static void FreeTreeNode(SAStore *saStore, ListNode *node);
@@ -50,7 +54,12 @@ int SASTORA_Save(SAStore *saStore, const char *service, const char *feature, con
     if (saStore == NULL || service == NULL || identity == NULL) {
         return EC_INVALID;
     }
-
+#ifdef MINI_SAMGR_LITE_RPC
+    SaNode *saNode = GetSaNodeBySaName(service, feature);
+    if (saNode != NULL) {
+        saNode->token = identity->token;
+    }
+#endif
     ListNode *curNode = FindServiceByName(saStore->root, service);
     FeatureNode *fNode = (curNode == NULL) ? NULL : curNode->info.head;
     fNode = FindFeatureByName(fNode, feature);
@@ -90,6 +99,9 @@ int SASTORA_Save(SAStore *saStore, const char *service, const char *feature, con
         }
 
         curNode->info.handle = identity->handle;
+#ifdef MINI_SAMGR_LITE_RPC
+        curNode->info.cookie = identity->cookie;
+#endif
         curNode->info.head = NULL;
         curNode->next = saStore->root;
         saStore->root = curNode;
@@ -209,7 +221,9 @@ SvcIdentity SASTORA_Find(SAStore *saStore, const char *service, const char *feat
     }
 
     identity.handle = curNode->info.handle;
-
+#ifdef MINI_SAMGR_LITE_RPC
+    identity.cookie = curNode->info.cookie;
+#endif
     FeatureNode *featureNode = FindFeatureByName(curNode->info.head, feature);
     if (featureNode != NULL) {
         identity.token = featureNode->token;
