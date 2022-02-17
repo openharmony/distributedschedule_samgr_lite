@@ -65,11 +65,11 @@ int QUEUE_Pop(MQueueId queueId, void *element, uint8 *pri, int timeout)
     }
 
     LockFreeBlockQueue *queue = (LockFreeBlockQueue *)queueId;
+    pthread_mutex_lock(&queue->rMutex);
     if (LFQUE_Pop(queue->queue, element, pri) == EC_SUCCESS) {
         return EC_SUCCESS;
     }
 
-    pthread_mutex_lock(&queue->rMutex);
     while (LFQUE_Pop(queue->queue, element, pri) != EC_SUCCESS) {
         pthread_cond_wait(&queue->cond, &queue->rMutex);
     }
