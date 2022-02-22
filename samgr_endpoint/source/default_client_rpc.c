@@ -217,7 +217,9 @@ static int ProxyInvoke(IClientProxy *proxy, int funcId, IpcIo *request, IOwner o
 
     IpcIo reply;
     void *replyBuf = NULL;
-    MessageOption flag = (notify == NULL) ? TF_OP_ASYNC : TF_OP_SYNC;
+    MessageOption flag;
+    MessageOptionInit(&flag);
+    flag.flags = (notify == NULL) ? TF_OP_ASYNC : TF_OP_SYNC;
     HILOG_DEBUG(HILOG_MODULE_SAMGR, "%d %lu, %lu, saId: %d\n", header->target.handle, header->target.token,
            header->target.cookie, header->saId);
     IpcIo requestWrapper;
@@ -277,7 +279,9 @@ static SvcIdentity QueryIdentity(const char *service, const char *feature)
     IpcIo reply;
     void *replyBuf = NULL;
     SvcIdentity samgr = {SAMGR_HANDLE, SAMGR_TOKEN, SAMGR_COOKIE};
-    int ret = SendRequest(samgr, INVALID_INDEX, &req, &reply, TF_OP_SYNC, (uintptr_t *)&replyBuf);
+    MessageOption flag;
+    MessageOptionInit(&flag);
+    int ret = SendRequest(samgr, INVALID_INDEX, &req, &reply, flag, (uintptr_t *)&replyBuf);
     int32_t sa_ret;
     ret = (ret != EC_SUCCESS) ? EC_FAILURE : ReadInt32(&reply, &sa_ret);
     SvcIdentity target = {INVALID_INDEX, INVALID_INDEX, INVALID_INDEX};

@@ -166,8 +166,10 @@ int32 SAMGR_AddSysCap(const Endpoint *endpoint, const char *sysCap, BOOL isReg)
     IpcIo reply;
     void *replyBuf = NULL;
     SvcIdentity samgr = {SAMGR_HANDLE, SAMGR_TOKEN, SAMGR_COOKIE};
+    MessageOption option;
+    MessageOptionInit(&option);
     int ret = SendRequest(samgr, INVALID_INDEX, &req, &reply,
-                          TF_OP_SYNC, (uintptr_t *)&replyBuf);
+                          option, (uintptr_t *)&replyBuf);
     ret = -ret;
     int32_t ipcRet = ret;
     if (ret == EC_SUCCESS) {
@@ -198,8 +200,10 @@ int32 SAMGR_GetSysCap(const Endpoint *endpoint, const char *sysCap, BOOL *isReg)
     IpcIo reply;
     void *replyBuf = NULL;
     SvcIdentity samgr = {SAMGR_HANDLE, SAMGR_TOKEN, SAMGR_COOKIE};
+    MessageOption option;
+    MessageOptionInit(&option);
     int ret = SendRequest(samgr, INVALID_INDEX, &req, &reply,
-                          TF_OP_SYNC, (uintptr_t *)&replyBuf);
+                          option, (uintptr_t *)&replyBuf);
     ret = -ret;
     *isReg = FALSE;
     int32_t ipcRet = ret;
@@ -225,8 +229,10 @@ static int SendGetAllSysCapsRequest(const Endpoint *endpoint, uint32 startIdx, I
     WriteUint32(&req, OP_ALL);
     WriteUint32(&req, startIdx);
     SvcIdentity samgr = {SAMGR_HANDLE, SAMGR_TOKEN, SAMGR_COOKIE};
+    MessageOption option;
+    MessageOptionInit(&option);
     int ret = SendRequest(samgr, INVALID_INDEX, &req, reply,
-                          TF_OP_SYNC, (uintptr_t *)replyBuf);
+                          option, (uintptr_t *)replyBuf);
     HILOG_DEBUG(HILOG_MODULE_SAMGR, "SendGetAllSysCapsRequest startIdx:%d, ret:%d!", startIdx, ret);
     return -ret;
 }
@@ -450,7 +456,9 @@ static int RegisterIdentity(const SaName *saName, SvcIdentity *saInfo,
     IpcIo reply;
     void *replyBuf = NULL;
     SvcIdentity samgr = {SAMGR_HANDLE, SAMGR_TOKEN, SAMGR_COOKIE};
-    int ret = SendRequest(samgr, INVALID_INDEX, &req, &reply, TF_OP_SYNC,
+    MessageOption option;
+    MessageOptionInit(&option);
+    int ret = SendRequest(samgr, INVALID_INDEX, &req, &reply, option,
                           (uintptr_t *)&replyBuf);
     ret = -ret;
     int32_t ipcRet;
