@@ -53,7 +53,7 @@ int QUEUE_Put(MQueueId queueId, const void *element, uint8 pri, int timeout)
     int ret = LFQUE_Push(queue->queue, element, pri);
     pthread_mutex_unlock(&queue->wMutex);
     pthread_mutex_lock(&queue->rMutex);
-    pthread_cond_signal(&queue->cond);
+    pthread_cond_broadcast(&queue->cond);
     pthread_mutex_unlock(&queue->rMutex);
     return ret;
 }
