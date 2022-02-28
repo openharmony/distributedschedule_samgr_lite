@@ -79,7 +79,7 @@ static int Dispatch(uint32_t code, IpcIo *data, IpcIo *reply, MessageOption opti
 static void HandleIpc(const Request *request, const Response *response);
 static int OnSamgrServerExit(void *ipcMsg, IpcIo *data, void *argv);
 static int RegisterRemoteFeatures(Endpoint *endpoint);
-static void Listen(Endpoint *endpoint, int token, const char *service, const char *feature);
+static void Listen(Endpoint *endpoint, int index, const char *service, const char *feature);
 static boolean JudgePolicy(uid_t callingUid, const PolicyTrans *policy, uint32 policyNum);
 static boolean SearchFixedPolicy(uid_t callingUid, PolicyTrans policy);
 static int AddPolicyToRouter(const Endpoint *endpoint, const SvcIdentity *saInfo,
@@ -110,7 +110,6 @@ Endpoint *SAMGR_CreateEndpoint(const char *name, RegisterEndpoint registry)
 
 int SAMGR_AddRouter(Endpoint *endpoint, const SaName *saName, const Identity *id, IUnknown *proxy)
 {
-    printf("%s %d %d service: %s\n", __FUNCTION__ , __LINE__, pthread_self(), saName->service?saName->service:"");
     if (endpoint == NULL || id == NULL || proxy == NULL || saName == NULL) {
         return EC_INVALID;
     }
@@ -461,7 +460,7 @@ static int RegisterIdentity(const SaName *saName, SvcIdentity *saInfo,
     int ret = SendRequest(samgr, INVALID_INDEX, &req, &reply, option,
                           (uintptr_t *)&replyBuf);
     ret = -ret;
-    int32_t ipcRet;
+    int32_t ipcRet = EC_FAILURE;
     if (ret == EC_SUCCESS) {
         ret = ReadInt32(&reply, &ipcRet);
     }
