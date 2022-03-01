@@ -234,7 +234,7 @@ static int32 Invoke(IServerProxy *iProxy, int funcId, void *origin, IpcIo *req, 
     ReadUint32(req, &resource);
     int32_t option;
     ReadInt32(req, &option);
-    if (server == NULL || resource >= RES_BUTT || resource < 0 || g_functions[resource] == NULL) {
+    if (server == NULL || resource >= RES_BUTT || g_functions[resource] == NULL) {
         HILOG_ERROR(HILOG_MODULE_SAMGR, "Invalid Msg<%d, %d, %d>", resource, option, funcId);
         return EC_INVALID;
     }
