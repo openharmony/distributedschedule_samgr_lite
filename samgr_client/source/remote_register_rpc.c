@@ -50,7 +50,7 @@ int SAMGR_RegisterServiceApi(const char *service, const char *feature, const Ide
     SaName saName = {service, feature};
     int32 token = SAMGR_AddRouter(g_remoteRegister.endpoint, &saName, identity, iUnknown);
     char saNameStr[2 * MAX_NAME_LEN + 2];
-    sprintf_s(saNameStr, 2 * MAX_NAME_LEN + 2, "%s#%s", service?service:"", feature?feature:"");
+    sprintf_s(saNameStr, 2 * MAX_NAME_LEN + 2, "%s#%s", service, feature?feature:"");
     HILOG_INFO(HILOG_MODULE_SAMGR, "register saname: %s index: %d\n", saNameStr, token);
     SaNode *saNode = GetSaNodeBySaName(service, feature);
     if (saNode != NULL) {
