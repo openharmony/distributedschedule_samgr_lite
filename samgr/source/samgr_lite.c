@@ -44,7 +44,7 @@ static IUnknown *GetDefaultFeatureApi(const char *serviceName);
 static IUnknown *GetFeatureApi(const char *serviceName, const char *feature);
 static int32 AddSystemCapability(const char *sysCap);
 static BOOL HasSystemCapability(const char *sysCap);
-static int32 GetSystemAvailableCapabilities(char sysCaps[MAX_SYSCAP_NUM][MAX_SYSCAP_NAME_LEN], int32 *size);
+static int32 GetSystemAvailableCapabilities(char sysCaps[MAX_SYSCAP_NUM][MAX_SYSCAP_NAME_LEN], int32 *sysCapNum);
 #ifdef MINI_SAMGR_LITE_RPC
 static IUnknown *GetRemoteDefaultFeatureApi(char *deviceId, const char *serviceName);
 #endif
