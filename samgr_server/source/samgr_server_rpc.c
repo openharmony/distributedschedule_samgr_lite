@@ -94,7 +94,7 @@ SaNode *GetSaNodeBySaName(const char *service, const char *feature)
     {
         if (strncmp(node->saName.service, service, MAX_NAME_LEN) == 0) {
             if (feature != NULL) {
-                if (strncmp(node->saName.feature, feature, MAX_NAME_LEN) == 0) {
+                if ((node->saName.feature != NULL) && (strncmp(node->saName.feature, feature, MAX_NAME_LEN) == 0)) {
                     retNode = node;
                 }
             } else {
@@ -173,7 +173,6 @@ static void InitializeGSaList()
 
 static void InitializeRegistry(void)
 {
-    printf("%s %d\n", __FUNCTION__ , __LINE__);
     InitializeGSaList();
     g_server.mtx = MUTEX_InitValue();
     SASTORA_Init(&g_server.store);
