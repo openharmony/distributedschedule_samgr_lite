@@ -113,26 +113,20 @@ int SAMGR_AddRouter(Endpoint *endpoint, const SaName *saName, const Identity *id
     if (endpoint == NULL || id == NULL || proxy == NULL || saName == NULL) {
         return EC_INVALID;
     }
-    printf("%s %d %d\n", __FUNCTION__ , __LINE__, pthread_self());
-    //todo: handle version
     IServerProxy *serverProxy = NULL;
     proxy->QueryInterface(proxy, SERVER_PROXY_VER, (void *)&serverProxy);
     if (serverProxy == NULL) {
     }
-    printf("%s %d %d\n", __FUNCTION__ , __LINE__, pthread_self());
-    // Lock the multi-write
     int index = VECTOR_FindByKey(&endpoint->routers, proxy);
     if (index != INVALID_INDEX) {
         serverProxy->Release((IUnknown *)serverProxy);
     }
-    printf("%s %d %d\n", __FUNCTION__ , __LINE__, pthread_self());
     Router *router = SAMGR_Malloc(sizeof(Router));
     if (router == NULL) {
         HILOG_ERROR(HILOG_MODULE_SAMGR, "Memory is not enough! Identity<%d, %d>",
                     id->serviceId, id->featureId);
         return EC_NOMEMORY;
     }
-    printf("%s %d %d\n", __FUNCTION__ , __LINE__, pthread_self());
     router->saName = *saName;
     router->identity = *id;
     router->proxy = serverProxy;
@@ -143,7 +137,6 @@ int SAMGR_AddRouter(Endpoint *endpoint, const SaName *saName, const Identity *id
         SAMGR_Free(router);
         return EC_FAILURE;
     }
-    printf("%s %d %d\n", __FUNCTION__ , __LINE__, pthread_self());
     Listen(endpoint, index, saName->service, saName->feature);
     return index;
 }
