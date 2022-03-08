@@ -196,7 +196,6 @@ static const char *GetName(Service *service)
 
 static BOOL Initialize(Service *service, Identity identity)
 {
-    //todo: move rpc here
     SamgrServer *server = (SamgrServer *)service;
     server->identity = identity;
     SaName saName = {SAMGR_SERVICE, NULL};

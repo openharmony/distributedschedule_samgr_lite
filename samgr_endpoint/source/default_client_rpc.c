@@ -300,7 +300,7 @@ static SvcIdentity QueryIdentity(const char *service, const char *feature)
 static SvcIdentity QueryRemoteIdentity(const char *deviceId, const char *service, const char *feature)
 {
     char saName[2 * MAX_NAME_LEN + 2];
-    sprintf_s(saName, 2 * MAX_NAME_LEN + 2, "%s#%s", service?service:"", feature?feature:"");
+    (void)sprintf_s(saName, 2 * MAX_NAME_LEN + 2, "%s#%s", service?service:"", feature?feature:"");
     HILOG_INFO(HILOG_MODULE_SAMGR, "saName %s, make remote binder start", saName);
 
     SvcIdentity target = {INVALID_INDEX, INVALID_INDEX, INVALID_INDEX};;
@@ -316,7 +316,6 @@ static SvcIdentity QueryRemoteIdentity(const char *deviceId, const char *service
         return target;
     }
     target.handle = GetNextHandle();
-    // todo: in l1, we should use ReadRemoteObject, because we should use IPC
     extern void WaitForProxyInit(SvcIdentity *svc);
     WaitForProxyInit(&target);
     HILOG_ERROR(HILOG_MODULE_SAMGR, "MakeRemoteBinder sid handle=%d", target.handle);

@@ -115,8 +115,6 @@ int SAMGR_AddRouter(Endpoint *endpoint, const SaName *saName, const Identity *id
     }
     IServerProxy *serverProxy = NULL;
     proxy->QueryInterface(proxy, SERVER_PROXY_VER, (void *)&serverProxy);
-    if (serverProxy == NULL) {
-    }
     int index = VECTOR_FindByKey(&endpoint->routers, proxy);
     if (index != INVALID_INDEX) {
         serverProxy->Release((IUnknown *)serverProxy);
@@ -225,7 +223,7 @@ static int SendGetAllSysCapsRequest(const Endpoint *endpoint, uint32 startIdx, I
     MessageOptionInit(&option);
     int ret = SendRequest(samgr, INVALID_INDEX, &req, reply,
                           option, (uintptr_t *)replyBuf);
-    HILOG_DEBUG(HILOG_MODULE_SAMGR, "SendGetAllSysCapsRequest startIdx:%d, ret:%d!", startIdx, ret);
+    HILOG_DEBUG(HILOG_MODULE_SAMGR, "SendGetAllSysCapsRequest startIdx:%u, ret:%d!", startIdx, ret);
     return -ret;
 }
 
