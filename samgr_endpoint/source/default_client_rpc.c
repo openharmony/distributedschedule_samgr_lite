@@ -233,6 +233,7 @@ static int ProxyInvoke(IClientProxy *proxy, int funcId, IpcIo *request, IOwner o
     WriteInt32(&requestWrapper, (int32_t)header->saId);
     if (!IpcIoAppend(&requestWrapper, request)) {
         HILOG_ERROR(HILOG_MODULE_SAMGR, "ipc io append fail\n");
+        FreeBuffer(tmpData2);
         return EC_INVALID;
     }
     int ret = SendRequest(header->target, funcId, &requestWrapper, &reply, flag, (uintptr_t *)&replyBuf);
