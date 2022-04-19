@@ -45,13 +45,13 @@ TaskPool *SAMGR_CreateFixedTaskPool(const TaskConfig *config, const char *name, 
 
     MQueueId queueId = (MQueueId)QUEUE_Create(name, sizeof(Exchange), config->queueSize);
     if (queueId == NULL) {
-        HILOG_ERROR(HILOG_MODULE_SAMGR, "Create Queue<%s> size:%d failed!", name, config->queueSize);
+        HILOG_ERROR(HILOG_MODULE_SAMGR, "Create Queue<%s> size:%hu failed!", name, config->queueSize);
         return NULL;
     }
 
     TaskPool *taskPool = (TaskPool *)SAMGR_Malloc(sizeof(TaskPool) + sizeof(ThreadId) * size);
     if (taskPool == NULL) {
-        HILOG_ERROR(HILOG_MODULE_SAMGR, "Create TaskPool<%s> size:%d failed!", name, config->queueSize);
+        HILOG_ERROR(HILOG_MODULE_SAMGR, "Create TaskPool<%s> size:%hu failed!", name, config->queueSize);
         QUEUE_Destroy(queueId);
         return NULL;
     }
@@ -81,7 +81,7 @@ int32 SAMGR_StartTaskPool(TaskPool *pool, const char *name)
     while (pool->top < pool->size) {
         register ThreadId threadId = (ThreadId)THREAD_Create(TaskEntry, pool->queueId, &attr);
         if (threadId == NULL) {
-            HILOG_ERROR(HILOG_MODULE_SAMGR, "Start Task<%s, %d, %d> failed!", name, pool->stackSize, pool->priority);
+            HILOG_ERROR(HILOG_MODULE_SAMGR, "Start Task<%s, %hu, %hhu> failed!", name, pool->stackSize, pool->priority);
             break;
         }
         pool->tasks[pool->top] = threadId;
