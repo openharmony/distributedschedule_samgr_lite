@@ -473,7 +473,7 @@ static void AddTaskPool(ServiceImpl *service, TaskConfig *cfg, const char *name)
     }
 
     if (service->taskPool == NULL) {
-        HILOG_ERROR(HILOG_MODULE_SAMGR, "Service<name:%s, flag:%d> create taskPool failed!", name, cfg->taskFlags);
+        HILOG_ERROR(HILOG_MODULE_SAMGR, "Service<name:%s, flag:%hhu> create taskPool failed!", name, cfg->taskFlags);
     }
 }
 
@@ -507,7 +507,7 @@ static void HandleInitRequest(const Request *request, const Response *response)
 {
     ServiceImpl *serviceImpl = (ServiceImpl *)request->data;
     if (serviceImpl == NULL) {
-        HILOG_ERROR(HILOG_MODULE_SAMGR, "Init service Request:<%d,%d>, Response:<%d>!",
+        HILOG_ERROR(HILOG_MODULE_SAMGR, "Init service Request:<%d,%u>, Response:<%d>!",
             request->msgId, request->msgValue, response->len);
         return;
     }
