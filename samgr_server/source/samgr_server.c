@@ -181,7 +181,7 @@ static int ProcEndpoint(SamgrServer *server, int32 option, void *origin, IpcIo *
     }
     MUTEX_Unlock(server->mtx);
     IpcIoPushUint32(reply, handle.handle);
-    HILOG_INFO(HILOG_MODULE_SAMGR, "Register Endpoint<%d, %d, %d>", handle.pid, handle.handle, handle.deadId);
+    HILOG_INFO(HILOG_MODULE_SAMGR, "Register Endpoint<%d, %u, %u>", handle.pid, handle.handle, handle.deadId);
     return EC_SUCCESS;
 }
 
@@ -229,7 +229,7 @@ static int32 ProcPutFeature(SamgrServer *server, const void *origin, IpcIo *req,
 
     ret = SASTORA_Save(&server->store, service, feature, identity);
     MUTEX_Unlock(server->mtx);
-    HILOG_DEBUG(HILOG_MODULE_SAMGR, "Register Feature<%s, %s> pid<%d>, id<%d, %d> ret:%d",
+    HILOG_DEBUG(HILOG_MODULE_SAMGR, "Register Feature<%s, %s> pid<%d>, id<%u, %u> ret:%d",
                 service, feature, pid, identity->handle, identity->token, ret);
     TransmitPolicy(ret, identity, reply, policy, policyNum);
     SAMGR_Free(policy);
@@ -294,7 +294,7 @@ static int32 ProcGetFeature(SamgrServer *server, const void *origin, IpcIo *req,
     *identity = SASTORA_Find(&server->store, service, feature);
     if (identity->handle == INVALID_INDEX) {
         MUTEX_Unlock(server->mtx);
-        HILOG_DEBUG(HILOG_MODULE_SAMGR, "Cannot Find Feature<%s, %s> id<%d, %d> ret:%d",
+        HILOG_DEBUG(HILOG_MODULE_SAMGR, "Cannot Find Feature<%s, %s> id<%u, %u> ret:%d",
                     service, feature, identity->handle, identity->token, EC_NOSERVICE);
         return EC_NOSERVICE;
     }
@@ -440,7 +440,7 @@ void ProcGetAllSysCap(const SamgrServer *server, IpcIo *req, IpcIo *reply)
     }
     int32 nextRequestIdx = startIdx;
     int32 replyNum = GetReplyNumAndNextReqIdx(sysCapablitys, startIdx, &nextRequestIdx);
-    HILOG_DEBUG(HILOG_MODULE_SAMGR, "ProcGetAllSysCap replyNum: %d, size: %d, startIdx: %d, nextRequestIdx: %d",
+    HILOG_DEBUG(HILOG_MODULE_SAMGR, "ProcGetAllSysCap replyNum: %d, size: %d, startIdx: %u, nextRequestIdx: %d",
                 replyNum, size, startIdx, nextRequestIdx);
     IpcIoPushInt32(reply, EC_SUCCESS);
     // indicate is the last reply
