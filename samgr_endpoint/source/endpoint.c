@@ -214,7 +214,7 @@ static int SendGetAllSysCapsRequest(const Endpoint *endpoint, uint32 startIdx, I
     SvcIdentity samgr = {SAMGR_HANDLE, SAMGR_TOKEN, SAMGR_COOKIE};
     int ret = Transact(endpoint->context, samgr, INVALID_INDEX, &req, reply,
         LITEIPC_FLAG_DEFAULT, (uintptr_t *)replyBuf);
-    HILOG_DEBUG(HILOG_MODULE_SAMGR, "SendGetAllSysCapsRequest startIdx:%d, ret:%d!", startIdx, ret);
+    HILOG_DEBUG(HILOG_MODULE_SAMGR, "SendGetAllSysCapsRequest startIdx:%u, ret:%d!", startIdx, ret);
     return -ret;
 }
 
@@ -452,7 +452,7 @@ static void HandleIpc(const Request *request, const Response *response)
     if ((strcmp(router->saName.service, SAMGR_SERVICE) != 0) &&
         !JudgePolicy(uid, (const PolicyTrans *)(router->policy), router->policyNum)) {
         FreeBuffer(endpoint->context, ipcMsg);
-        HILOG_ERROR(HILOG_MODULE_SAMGR, "Consumer uid<%d> has no permission to access<%s, %d, %d>!",
+        HILOG_ERROR(HILOG_MODULE_SAMGR, "Consumer uid<%u> has no permission to access<%s, %d, %d>!",
                     uid, router->saName.service, router->identity.serviceId, router->identity.featureId);
         return;
     }
