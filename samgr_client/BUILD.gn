@@ -28,7 +28,6 @@ if (!enable_ohos_distributedschedule_samgr_lite_rpc_mini) {
       "//foundation/distributedschedule/samgr_lite/interfaces/kits/registry",
       "//utils/native/lite/include",
       "//third_party/bounds_checking_function/include",
-      "//base/security/permission/services/permission_lite/include",
     ]
 
     public_deps = [
@@ -46,13 +45,10 @@ if (!enable_ohos_distributedschedule_samgr_lite_rpc_mini) {
     include_dirs = [
       "../samgr_server/source",
       "../samgr_endpoint/source",
-      "//base/security/permission/interfaces/innerkits/permission_lite",
-      "//base/security/permission/services/permission_lite/pms_base/include",
       "//foundation/distributedschedule/samgr_lite/interfaces/kits/samgr",
       "//foundation/distributedschedule/samgr_lite/interfaces/kits/registry",
       "//utils/native/lite/include",
       "//third_party/bounds_checking_function/include",
-      "//base/security/permission/services/permission_lite/include",
     ]
 
     public_deps = [
