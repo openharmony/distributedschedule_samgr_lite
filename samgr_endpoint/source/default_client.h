@@ -15,10 +15,6 @@
 #ifndef LITE_DEFAULT_CLIENT_H
 #define LITE_DEFAULT_CLIENT_H
 
-#ifndef MINI_SAMGR_LITE_RPC
-#include <liteipc_adapter.h>
-#endif
-
 #include "iunknown.h"
 
 #ifdef __cplusplus
@@ -32,13 +28,8 @@ struct SaName {
     const char *feature;
 };
 
-#ifndef MINI_SAMGR_LITE_RPC
-IUnknown *SAMGR_CreateIProxy(const IpcContext *context, const char *service, const char *feature);
-#else
 IUnknown *SAMGR_CreateIProxy(const char *service, const char *feature);
 IUnknown *SAMGR_CreateIRemoteProxy(const char *deviceId, const char *service, const char *feature);
-#endif
-
 SaName *SAMGR_GetSAName(const IUnknown *proxy);
 int SAMGR_CompareSAName(const SaName *key1, const SaName *key2);
 #ifdef __cplusplus

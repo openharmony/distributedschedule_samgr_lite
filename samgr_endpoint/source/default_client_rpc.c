@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Huawei Device Co., Ltd.
+ * Copyright (c) 2020-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,65 +12,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "default_client.h"
-
-#include <log.h>
-#include <ohos_errno.h>
-#include <pthread.h>
-#include <string.h>
-#include <service_registry.h>
-#include "client_factory.h"
-#include "dbinder_service.h"
-#include "endpoint.h"
-#include "ipc_skeleton.h"
-#include "iproxy_client.h"
-#include "memory_adapter.h"
-#include "samgr_server.h"
-#include "thread_adapter.h"
-
-#undef LOG_TAG
-#undef LOG_DOMAIN
-#define LOG_TAG "Samgr"
-#define LOG_DOMAIN 0xD001800
-typedef struct IClientHeader IClientHeader;
-typedef struct IDefaultClient IDefaultClient;
-typedef struct IClientEntry IClientEntry;
-struct IClientHeader {
-    SaName key;
-    SvcIdentity target;
-    uint32 deadId;
-    uintptr_t saId;
-};
-
-struct IClientEntry {
-    INHERIT_IUNKNOWNENTRY(IClientProxy);
-};
-
-#pragma pack(1)
-struct IDefaultClient {
-    IClientHeader header;
-    IClientEntry entry;
-};
-#pragma pack()
+#include "default_client_adapter.h"
 
 static int AddRef(IUnknown *iUnknown);
 static int Release(IUnknown *proxy);
 static int ProxyInvoke(IClientProxy *proxy, int funcId, IpcIo *request, IOwner owner, INotify notify);
-static int OnServiceExit(void *ipcMsg, IpcIo *data, void *argv);
+static void OnServiceExit(void *argv);
 static SvcIdentity QueryIdentity(const char *service, const char *feature);
 static SvcIdentity QueryRemoteIdentity(const char *deviceId, const char *service, const char *feature);
 static const IClientEntry DEFAULT_ENTRY = {CLIENT_IPROXY_BEGIN, .Invoke = ProxyInvoke, IPROXY_END};
 static MutexId g_mutex = NULL;
-static pthread_mutex_t g_handleMutex = PTHREAD_MUTEX_INITIALIZER;
-static int32_t g_handle = 0;
-
-static int32_t GetNextHandle(void)
-{
-    pthread_mutex_lock(&g_handleMutex);
-    int32_t handle = ++g_handle;
-    pthread_mutex_unlock(&g_handleMutex);
-    return handle;
-}
 
 IUnknown *SAMGR_CreateIProxy(const char *service, const char *feature)
 {
@@ -92,6 +43,7 @@ IUnknown *SAMGR_CreateIProxy(const char *service, const char *feature)
     header->target = identity;
     header->key.service = service;
     header->key.feature = feature;
+    header->saId = 0;
     (void)AddDeathRecipient(identity, OnServiceExit, client, &header->deadId);
 
     IClientEntry *entry = &client->entry;
@@ -118,10 +70,7 @@ IUnknown *SAMGR_CreateIRemoteProxy(const char* deviceId, const char *service, co
     header->target = identity;
     header->key.service = service;
     header->key.feature = feature;
-    SaNode *saNode = GetSaNodeBySaName(service, feature);
-    if (saNode != NULL) {
-        header->saId = saNode->saId;
-    }
+    header->saId = GetRemoteSaIdInner(service, feature);
 
     IClientEntry *entry = &client->entry;
     entry->iUnknown.Invoke = ProxyInvoke;
@@ -220,24 +169,24 @@ static int ProxyInvoke(IClientProxy *proxy, int funcId, IpcIo *request, IOwner o
     MessageOption flag;
     MessageOptionInit(&flag);
     flag.flags = (notify == NULL) ? TF_OP_ASYNC : TF_OP_SYNC;
-    HILOG_DEBUG(HILOG_MODULE_SAMGR, "%d %lu, %lu, saId: %d\n", header->target.handle, header->target.token,
-           header->target.cookie, header->saId);
     IpcIo requestWrapper;
-    uint8_t *tmpData2 = (uint8_t *) malloc(MAX_IO_SIZE);
-    if (tmpData2 == NULL) {
+    uint8_t *data = (uint8_t *) malloc(MAX_IO_SIZE);
+    if (data == NULL) {
         HILOG_ERROR(HILOG_MODULE_SAMGR, "malloc data for ipc io failed\n");
         return EC_INVALID;
     } else {
-        IpcIoInit(&requestWrapper, tmpData2, MAX_IO_SIZE, MAX_OBJ_NUM);
+        IpcIoInit(&requestWrapper, data, MAX_IO_SIZE, MAX_OBJ_NUM);
     }
-    WriteInt32(&requestWrapper, (int32_t)header->saId);
-    if (!IpcIoAppend(&requestWrapper, request)) {
-        HILOG_ERROR(HILOG_MODULE_SAMGR, "ipc io append fail\n");
-        FreeBuffer(tmpData2);
-        return EC_INVALID;
+    ProxyInvokeArgInner(&requestWrapper, header);
+    if(request != NULL) {
+        if (!IpcIoAppend(&requestWrapper, request)) {
+            HILOG_ERROR(HILOG_MODULE_SAMGR, "ipc io append fail\n");
+            free(data);
+            return EC_INVALID;
+        }
     }
     int ret = SendRequest(header->target, funcId, &requestWrapper, &reply, flag, (uintptr_t *)&replyBuf);
-    FreeBuffer(tmpData2);
+    free(data);
 
     if (notify != NULL) {
         notify(owner, ret, &reply);
@@ -249,20 +198,15 @@ static int ProxyInvoke(IClientProxy *proxy, int funcId, IpcIo *request, IOwner o
     return ret;
 }
 
-static int OnServiceExit(void *ipcMsg, IpcIo *data, void *argv)
+static void OnServiceExit(void *argv)
 {
-    (void)data;
     IClientHeader *header = (IClientHeader *)argv;
-    (void)RemoveDeathRecipient(header->target, header->deadId);
+    ReleaseSvc(header->target);
     header->deadId = INVALID_INDEX;
     header->target.handle = INVALID_INDEX;
     header->target.token = INVALID_INDEX;
     header->target.cookie = INVALID_INDEX;
-    if (ipcMsg != NULL) {
-        FreeBuffer(ipcMsg);
-    }
     HILOG_ERROR(HILOG_MODULE_SAMGR, "Miss the remote service<%u, %u>!", header->target.handle, header->target.token);
-    return EC_SUCCESS;
 }
 
 static SvcIdentity QueryIdentity(const char *service, const char *feature)
@@ -270,24 +214,28 @@ static SvcIdentity QueryIdentity(const char *service, const char *feature)
     IpcIo req;
     uint8 data[MAX_DATA_LEN];
     IpcIoInit(&req, data, MAX_DATA_LEN, 0);
+    WriteInt32(&req, 0);
     WriteUint32(&req, RES_FEATURE);
     WriteUint32(&req, OP_GET);
     WriteString(&req, service);
     WriteBool(&req, feature == NULL);
     if (feature != NULL) {
-        WriteBool(&req, feature);
+        WriteString(&req, feature);
     }
     IpcIo reply;
     void *replyBuf = NULL;
-    SvcIdentity samgr = {SAMGR_HANDLE, SAMGR_TOKEN, SAMGR_COOKIE};
+    SvcIdentity *samgr = GetContextObject();
     MessageOption flag;
     MessageOptionInit(&flag);
-    int ret = SendRequest(samgr, INVALID_INDEX, &req, &reply, flag, (uintptr_t *)&replyBuf);
+    int ret = SendRequest(*samgr, INVALID_INDEX, &req, &reply, flag, (uintptr_t *)&replyBuf);
     int32_t sa_ret = EC_FAILURE;
     ret = (ret != EC_SUCCESS) ? EC_FAILURE : ReadInt32(&reply, &sa_ret);
     SvcIdentity target = {INVALID_INDEX, INVALID_INDEX, INVALID_INDEX};
     if (sa_ret == EC_SUCCESS) {
         ReadRemoteObject(&reply, &target);
+        uint32_t token;
+        ReadUint32(&reply, &token);
+        target.token = (uintptr_t)token;
     }
     if (ret == EC_PERMISSION) {
         HILOG_INFO(HILOG_MODULE_SAMGR, "Cannot Access<%s, %s> No Permission!", service, feature);
@@ -300,25 +248,5 @@ static SvcIdentity QueryIdentity(const char *service, const char *feature)
 
 static SvcIdentity QueryRemoteIdentity(const char *deviceId, const char *service, const char *feature)
 {
-    char saName[2 * MAX_NAME_LEN + 2];
-    (void)sprintf_s(saName, 2 * MAX_NAME_LEN + 2, "%s#%s", service?service:"", feature?feature:"");
-    HILOG_INFO(HILOG_MODULE_SAMGR, "saName %s, make remote binder start", saName);
-
-    SvcIdentity target = {INVALID_INDEX, INVALID_INDEX, INVALID_INDEX};;
-    SaNode *saNode = GetSaNodeBySaName(service, feature);
-    if (saNode == NULL) {
-        HILOG_ERROR(HILOG_MODULE_SAMGR, "service: %s feature: %s have no saId in sa map", service, feature);
-        return target;
-    }
-    int32_t ret = MakeRemoteBinder(saName, strlen(saName), deviceId, strlen(deviceId), saNode->saId, 0,
-                                   &target);
-    if (ret != EC_SUCCESS) {
-        HILOG_ERROR(HILOG_MODULE_SAMGR, "MakeRemoteBinder failed");
-        return target;
-    }
-    target.handle = GetNextHandle();
-    extern void WaitForProxyInit(SvcIdentity *svc);
-    WaitForProxyInit(&target);
-    HILOG_ERROR(HILOG_MODULE_SAMGR, "MakeRemoteBinder sid handle=%d", target.handle);
-    return target;
+    return QueryRemoteIdentityInner(deviceId, service, feature);
 }

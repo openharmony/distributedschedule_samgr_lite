@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Huawei Device Co., Ltd.
+ * Copyright (c) 2020-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -129,15 +129,6 @@ struct Feature {
  * This macro provides the capability of inheriting the feature lifecycle. \n
  *
  */
-#ifndef MINI_SAMGR_LITE_RPC
-
-#define INHERIT_FEATURE                                                         \
-    const char *(*GetName)(Feature *feature);                                   \
-    void (*OnInitialize)(Feature *feature, Service *parent, Identity identity); \
-    void (*OnStop)(Feature *feature, Identity identity);                        \
-    BOOL (*OnMessage)(Feature *feature, Request *request)
-
-#else
 
 #define INHERIT_FEATURE                                                         \
     const char *(*GetName)(Feature *feature);                                   \
@@ -145,9 +136,6 @@ struct Feature {
     void (*OnStop)(Feature *feature, Identity identity);                        \
     BOOL (*OnMessage)(Feature *feature, Request *request);                      \
     BOOL (*IsDistributed)(void)
-
-#endif
-
 #ifdef __cplusplus
 #if __cplusplus
 }
