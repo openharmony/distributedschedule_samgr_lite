@@ -20,9 +20,7 @@
 #include "iproxy_server.h"
 #include "endpoint.h"
 #include "sa_store.h"
-#ifdef MINI_SAMGR_LITE_RPC
 #include "utils_list.h"
-#endif
 
 #ifdef __cplusplus
 #if __cplusplus
@@ -58,7 +56,6 @@ struct SysCapImpl {
     BOOL isRegister;
 };
 
-#ifdef MINI_SAMGR_LITE_RPC
 typedef struct {
     UTILS_DL_LIST list;
     SaName saName;
@@ -67,7 +64,6 @@ typedef struct {
 } SaNode;
 SaNode *GetSaNodeBySaName(const char *service, const char *feature);
 SaNode *GetSaNodeBySaId(uintptr_t saId);
-#endif
 
 #ifdef __cplusplus
 #if __cplusplus
