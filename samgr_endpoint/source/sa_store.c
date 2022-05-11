@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Huawei Device Co., Ltd.
+ * Copyright (c) 2020-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,7 +17,6 @@
 #include <securec.h>
 #include "common.h"
 #include "memory_adapter.h"
-
 #ifdef MINI_SAMGR_LITE_RPC
 #include "samgr_server.h"
 #endif
@@ -97,11 +96,8 @@ int SASTORA_Save(SAStore *saStore, const char *service, const char *feature, con
             SAMGR_Free(curNode);
             return EC_INVALID;
         }
-
         curNode->info.handle = identity->handle;
-#ifdef MINI_SAMGR_LITE_RPC
         curNode->info.cookie = identity->cookie;
-#endif
         curNode->info.head = NULL;
         curNode->next = saStore->root;
         saStore->root = curNode;
@@ -221,9 +217,7 @@ SvcIdentity SASTORA_Find(SAStore *saStore, const char *service, const char *feat
     }
 
     identity.handle = curNode->info.handle;
-#ifdef MINI_SAMGR_LITE_RPC
     identity.cookie = curNode->info.cookie;
-#endif
     FeatureNode *featureNode = FindFeatureByName(curNode->info.head, feature);
     if (featureNode != NULL) {
         identity.token = featureNode->token;

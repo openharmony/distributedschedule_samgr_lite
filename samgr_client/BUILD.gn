@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Huawei Device Co., Ltd.
+# Copyright (c) 2020-2022 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -15,7 +15,7 @@ import("../config.gni")
 
 if (!enable_ohos_distributedschedule_samgr_lite_rpc_mini) {
   source_set("client") {
-    sources = [ "source/remote_register.c" ]
+    sources = [ "source/remote_register_rpc.c" ]
 
     cflags = [
       "-fPIC",
@@ -31,13 +31,14 @@ if (!enable_ohos_distributedschedule_samgr_lite_rpc_mini) {
     ]
 
     public_deps = [
-      "//foundation/communication/ipc_lite:liteipc_adapter",
+      "//foundation/communication/ipc/interfaces/innerkits/c/ipc:ipc_single",
       "//foundation/distributedschedule/samgr_lite/samgr_endpoint:endpoint_source",
       "//third_party/bounds_checking_function:libsec_shared",
     ]
   }
 } else {
   source_set("client") {
+    defines = [ "MINI_SAMGR_LITE_RPC" ]
     sources = [ "source/remote_register_rpc.c" ]
 
     cflags = [ "-Wall" ]

@@ -25,7 +25,9 @@
 #include <sys/stat.h>
 
 #include "cJSON.h"
+#ifdef MINI_SAMGR_LITE_RPC
 #include "dbinder_service.h"
+#endif
 #include "default_client.h"
 #include "ipc_skeleton.h"
 #include "memory_adapter.h"
@@ -58,7 +60,7 @@ static int ProcEndpoint(SamgrServer *server, int32 option, void *origin, IpcIo *
 static int32 ProcPutFeature(SamgrServer *server, const void *origin, IpcIo *req, IpcIo *reply, SvcIdentity *identity);
 static int32 ProcGetFeature(SamgrServer *server, const void *origin, IpcIo *req, IpcIo *reply, SvcIdentity *identity);
 static int ProcFeature(SamgrServer *server, int32 option, void *origin, IpcIo *req, IpcIo *reply);
-static int RegisterSamgrEndpoint(SvcIdentity* identity);
+static int RegisterSamgrEndpoint(SvcIdentity* identity, int token, const char *service, const char *feature);
 static void TransmitPolicy(int ret, const SvcIdentity* identity, IpcIo *reply,
                            const PolicyTrans *policy, uint32 policyNum);
 static void TransmitFixedPolicy(IpcIo *reply, PolicyTrans policy);
@@ -125,7 +127,7 @@ SaNode *GetSaNodeBySaId(uintptr_t saId)
     pthread_mutex_unlock(&g_saMutex);
     return retNode;
 }
-
+#ifdef MINI_SAMGR_LITE_RPC
 void RpcStartSamgr(void)
 {
     pthread_setname_np(pthread_self(), "rpc_server");
@@ -133,10 +135,9 @@ void RpcStartSamgr(void)
             .cookie = 0
     };
     (void)SetContextObject(target);
-
     StartDBinderService();
 }
-
+#endif
 int32_t GetSystemAbilityById(int32_t saId, IpcIo *reply)
 {
     SaNode *saNode = GetSaNodeBySaId(saId);
@@ -173,19 +174,29 @@ static void InitializeGSaList()
 
 static void InitializeRegistry(void)
 {
+#ifdef MINI_SAMGR_LITE_RPC
     InitializeGSaList();
+#endif
     g_server.mtx = MUTEX_InitValue();
     SASTORA_Init(&g_server.store);
     g_server.samgr = SAMGR_CreateEndpoint("samgr", RegisterSamgrEndpoint);
     SAMGR_GetInstance()->RegisterService((Service *)&g_server);
     g_server.sysCapMtx = MUTEX_InitValue();
     g_server.sysCapabilitys = VECTOR_Make((VECTOR_Key)GetSysCapName, (VECTOR_Compare)strcmp);
+#ifndef MINI_SAMGR_LITE_RPC
+    ParseSysCap();
+#endif
 }
 SYS_SERVICE_INIT(InitializeRegistry);
 
 static BOOL CanRequest(const void *origin)
 {
+#ifndef MINI_SAMGR_LITE_RPC
+    pid_t uid = GetCallingUid();
+    return uid < UID_HAP;
+#else
     return TRUE;
+#endif
 }
 
 static const char *GetName(Service *service)
@@ -233,7 +244,7 @@ static int32 Invoke(IServerProxy *iProxy, int funcId, void *origin, IpcIo *req, 
     int32_t option;
     ReadInt32(req, &option);
     if (server == NULL || resource >= RES_BUTT || g_functions[resource] == NULL) {
-        HILOG_ERROR(HILOG_MODULE_SAMGR, "Invalid Msg<%d, %d, %d>", resource, option, funcId);
+        HILOG_ERROR(HILOG_MODULE_SAMGR, "Invalid Msg<%d, %u, %d>", resource, option, funcId);
         return EC_INVALID;
     }
     return g_functions[resource](server, option, origin, req, reply);
@@ -250,32 +261,35 @@ static int ProcEndpoint(SamgrServer *server, int32 option, void *origin, IpcIo *
         WriteInt32(reply, INVALID_INDEX);
         return EC_FAILURE;
     }
-
-    pid_t pid = 0;
+    pid_t pid = GetCallingPid();
     PidHandle handle;
     MUTEX_Lock(server->mtx);
     int index = SASTORA_FindHandleByPid(&g_server.store, pid, &handle);
     if (index == INVALID_INDEX) {
         SvcIdentity identity = {(int32)INVALID_INDEX, (uint32)INVALID_INDEX, (uint32)INVALID_INDEX};
-#ifdef __LINUX__
-        IpcMsg* data = (IpcMsg*)origin;
-        if (data == NULL) {
-            HILOG_ERROR(HILOG_MODULE_SAMGR, "Register Endpoint origin null pointer!");
+#ifndef MINI_SAMGR_LITE_RPC
+        bool ret = ReadRemoteObject(req, &identity);
+        if (ret) {
+            // identity.handle <= 0 In-process communication,identity.handle > 0 Cross-process communication
+            if ((identity.handle <= 0) && (identity.cookie != 0)) {
+                identity.handle = 0;
+            }
+        } else {
+            WriteInt32(reply, INVALID_INDEX);
             return EC_FAILURE;
         }
-        identity.handle = data->target.handle;
-        BinderAcquire(g_server.samgr->context, identity.handle);
 #endif
+        handle.uid = GetCallingUid();
         handle.pid = pid;
-        handle.uid = 0;
         handle.handle = identity.handle;
+        handle.cookie = identity.cookie;
         handle.deadId = INVALID_INDEX;
         (void)SASTORA_SaveHandleByPid(&server->store, handle);
         (void)RemoveDeathRecipient(identity, handle.deadId);
         (void)AddDeathRecipient(identity, OnEndpointExit, (void*)((uintptr_t)pid), &handle.deadId);
     }
     MUTEX_Unlock(server->mtx);
-    WriteUint32(reply, handle.handle);
+    WriteInt32(reply, handle.handle);
     HILOG_INFO(HILOG_MODULE_SAMGR, "Register Endpoint<%d, %d, %d>", handle.pid, handle.handle, handle.deadId);
     return EC_SUCCESS;
 }
@@ -288,13 +302,12 @@ static int32 ProcPutFeature(SamgrServer *server, const void *origin, IpcIo *req,
         WriteInt32(reply, EC_INVALID);
         return EC_INVALID;
     }
-    pid_t pid = 0;
-    uid_t uid = 0;
+    pid_t pid = GetCallingPid();
+    uid_t uid = GetCallingUid();
     bool isFeature;
     ReadBool(req, &isFeature);
-
     char *feature = NULL;
-    if (isFeature) {
+    if (!isFeature) {
         feature = (char *)ReadString(req, &len);
     }
     MUTEX_Lock(server->mtx);
@@ -312,9 +325,13 @@ static int32 ProcPutFeature(SamgrServer *server, const void *origin, IpcIo *req,
         WriteInt32(reply, EC_INVALID);
         return EC_INVALID;
     }
+#ifndef MINI_SAMGR_LITE_RPC
+    ReadUint32(req, &identity->token);
+#else
     identity->token = ReadPointer(req);
+#endif
     identity->handle = (int32_t)handle.handle;
-
+    identity->cookie = handle.cookie;
     PolicyTrans *policy = NULL;
     RegParams regParams = {service, feature, handle.uid, handle.pid};
     uint32 policyNum = 0;
@@ -327,7 +344,6 @@ static int32 ProcPutFeature(SamgrServer *server, const void *origin, IpcIo *req,
         WriteInt32(reply, EC_PERMISSION);
         return EC_PERMISSION;
     }
-
     ret = SASTORA_Save(&server->store, service, feature, identity);
     MUTEX_Unlock(server->mtx);
     HILOG_DEBUG(HILOG_MODULE_SAMGR, "Register Feature<%s, %s> pid<%d>, id<%d, %d> ret:%d",
@@ -393,7 +409,7 @@ static int32 ProcGetFeature(SamgrServer *server, const void *origin, IpcIo *req,
     bool isFeature;
     ReadBool(req, &isFeature);
     char *feature = NULL;
-    if (isFeature) {
+    if (!isFeature) {
         feature = (char *)ReadString(req, &len);
     }
     MUTEX_Lock(server->mtx);
@@ -404,7 +420,6 @@ static int32 ProcGetFeature(SamgrServer *server, const void *origin, IpcIo *req,
                     service, feature, identity->handle, identity->token, EC_NOSERVICE);
         return EC_NOSERVICE;
     }
-
     PidHandle providerPid = SASTORA_FindPidHandleByIpcHandle(&server->store, identity->handle);
     MUTEX_Unlock(server->mtx);
     if (providerPid.pid == INVALID_INDEX || providerPid.uid == INVALID_INDEX) {
@@ -415,8 +430,8 @@ static int32 ProcGetFeature(SamgrServer *server, const void *origin, IpcIo *req,
     AuthParams authParams = {
             .providerService = service,
             .providerfeature = feature,
-            .consumerPid = 0,
-            .consumerUid = 0,
+            .consumerPid = GetCallingPid(),
+            .consumerUid = GetCallingUid(),
             .providerPid = providerPid.pid,
             .providerUid = providerPid.uid
     };
@@ -453,7 +468,9 @@ static int ProcFeature(SamgrServer *server, int32 option, void *origin, IpcIo *r
         ret = ProcGetFeature(server, origin, req, reply, &identity);
         WriteInt32(reply, ret);
         if (ret == EC_SUCCESS) {
+            // The WriteRemoteObject identity.token parameter is invalid
             WriteRemoteObject(reply, &identity);
+            WriteUint32(reply, (uint32_t)identity.token);
         }
     }
     return ret;
@@ -558,7 +575,7 @@ void ProcGetAllSysCap(SamgrServer *server, IpcIo *req, IpcIo *reply)
         if (serviceImpl->isRegister == FALSE) {
             continue;
         }
-        WriteBool(reply, serviceImpl->name);
+        WriteString(reply, serviceImpl->name);
         cnt++;
     }
     MUTEX_Unlock(server->sysCapMtx);
@@ -594,8 +611,15 @@ static int ProcSysCap(SamgrServer *server, int32 option, void *origin, IpcIo *re
     return EC_SUCCESS;
 }
 
-static int RegisterSamgrEndpoint(SvcIdentity* identity)
+static int RegisterSamgrEndpoint(SvcIdentity* identity, int token, const char *service, const char *feature)
 {
+#ifndef MINI_SAMGR_LITE_RPC
+    int ret = SetContextObject(*identity);
+    if (ret != EC_SUCCESS) {
+        HILOG_FATAL(HILOG_MODULE_SAMGR, "Set sa manager<%d> failed!", ret);
+        return EC_INVALID;
+    }
+#endif
     identity->handle = SAMGR_HANDLE;
     identity->token = SAMGR_TOKEN;
     identity->cookie = SAMGR_COOKIE;
@@ -618,15 +642,15 @@ static void OnEndpointExit(void* argv)
         sleep(RETRY_INTERVAL);
         --retry;
     }
-#ifdef __LINUX__
+
     PidHandle handle;
     int err = SASTORA_FindHandleByPid(&g_server.store, pid, &handle);
     if (err != INVALID_INDEX) {
-        BinderRelease(context, handle.handle);
+        SvcIdentity target = {INVALID_INDEX, INVALID_INDEX, INVALID_INDEX};
+        target.handle = handle.handle;
+        ReleaseSvc(target);
     }
-#endif
     HILOG_ERROR(HILOG_MODULE_SAMGR, "IPC pid<%d> exit! send clean request retry(%d), ret(%d)!", pid, retry, ret);
-    return EC_SUCCESS;
 }
 
 static IpcAuthInterface *GetIpcAuthInterface(void)

@@ -16,15 +16,16 @@
 #include <ohos_errno.h>
 #include <ohos_init.h>
 #include <log.h>
-
+#ifdef MINI_SAMGR_LITE_RPC
 #include "dbinder_service.h"
+#include "samgr_server.h"
+#endif
 #include "default_client.h"
 #include "iproxy_client.h"
 #include "memory_adapter.h"
 #include "policy_define.h"
 #include "pthread.h"
 #include "samgr_lite.h"
-#include "samgr_server.h"
 #include "thread_adapter.h"
 #include "unistd.h"
 
@@ -49,6 +50,7 @@ int SAMGR_RegisterServiceApi(const char *service, const char *feature, const Ide
     MUTEX_Lock(g_remoteRegister.mtx);
     SaName saName = {service, feature};
     int32 token = SAMGR_AddRouter(g_remoteRegister.endpoint, &saName, identity, iUnknown);
+#ifdef MINI_SAMGR_LITE_RPC
     char saNameStr[2 * MAX_NAME_LEN + 2];
     (void)sprintf_s(saNameStr, 2 * MAX_NAME_LEN + 2, "%s#%s", service, feature?feature:"");
     HILOG_INFO(HILOG_MODULE_SAMGR, "register saname: %s index: %d\n", saNameStr, token);
@@ -56,10 +58,14 @@ int SAMGR_RegisterServiceApi(const char *service, const char *feature, const Ide
     if (saNode != NULL) {
         RegisterRemoteProxy(saNameStr, strlen(saNameStr), saNode->saId);
     }
+#endif
     MUTEX_Unlock(g_remoteRegister.mtx);
     if (token < 0 || !g_remoteRegister.endpoint->running) {
         return token;
     }
+#ifndef MINI_SAMGR_LITE_RPC
+    SAMGR_ProcPolicy(g_remoteRegister.endpoint, &saName, token);
+#endif
     return EC_SUCCESS;
 }
 
@@ -129,6 +135,13 @@ static void ClearRegistry(void)
 
 static void ClientInitializeRegistry(void)
 {
+#ifndef MINI_SAMGR_LITE_RPC
+    if (getuid() >= ABILITY_UID_START && !g_isAbilityInited) {
+        ClearRegistry();
+        g_isAbilityInited = TRUE;
+    }
+#endif
+
     if (g_remoteRegister.endpoint != NULL) {
         return;
     }
