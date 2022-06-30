@@ -158,7 +158,8 @@ static const char *GetSysCapName(const SysCapImpl *serviceImpl)
     return serviceImpl->name;
 }
 
-static void InitializeGSaList()
+#ifdef MINI_SAMGR_LITE_RPC
+static void InitializeGSaList(void)
 {
     SaNode *saNode = (SaNode *)malloc(sizeof(SaNode));
     if (saNode == NULL) {
@@ -171,6 +172,7 @@ static void InitializeGSaList()
     UtilsListInit(&g_saList);
     UtilsListAdd(&g_saList, &saNode->list);
 }
+#endif
 
 static void InitializeRegistry(void)
 {
