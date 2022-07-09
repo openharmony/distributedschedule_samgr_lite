@@ -41,8 +41,6 @@ if (!enable_ohos_distributedschedule_samgr_lite_rpc_mini) {
     defines = [ "MINI_SAMGR_LITE_RPC" ]
     sources = [ "source/remote_register_rpc.c" ]
 
-    cflags = [ "-Wall" ]
-
     include_dirs = [
       "../samgr_server/source",
       "../samgr_endpoint/source",

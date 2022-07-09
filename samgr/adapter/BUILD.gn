@@ -29,7 +29,6 @@ if (ohos_kernel_type == "liteos_m") {
     ]
 
     public_configs = [ ":samgr_adapter_public" ]
-    cflags = [ "-Wall" ]
 
     include_dirs = [
       "//kernel/liteos_m/kal/",

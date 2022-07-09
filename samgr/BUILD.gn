@@ -42,7 +42,6 @@ if (ohos_kernel_type == "liteos_m") {
     ]
 
     public_configs = [ ":samgr_public" ]
-    cflags = [ "-Wall" ]
 
     include_dirs =
         [ "//base/hiviewdfx/hilog_lite/interfaces/native/kits/hilog_lite" ]

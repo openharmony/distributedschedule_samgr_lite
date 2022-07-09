@@ -51,7 +51,7 @@ void MUTEX_GlobalUnlock(void)
 
 ThreadId THREAD_Create(Runnable run, void *argv, const ThreadAttr *attr)
 {
-    osThreadAttr_t taskAttr = {attr->name, 0, NULL, 0, NULL, attr->stackSize, attr->priority, 0, 0};
+    osThreadAttr_t taskAttr = {attr->name, 0, NULL, 0, NULL, attr->stackSize, (osPriority_t)(attr->priority), 0, 0};
     return (ThreadId)osThreadNew((osThreadFunc_t)run, argv, &taskAttr);
 }
 
