@@ -115,8 +115,6 @@ if (!enable_ohos_distributedschedule_samgr_lite_rpc_mini) {
       "source/token_bucket.c",
     ]
 
-    cflags = [ "-Wall" ]
-
     if (ohos_kernel_type == "linux") {
       defines = [
         "_GNU_SOURCE",
@@ -137,10 +135,7 @@ if (!enable_ohos_distributedschedule_samgr_lite_rpc_mini) {
   source_set("store_source") {
     sources = [ "source/sa_store.c" ]
 
-    cflags = [ "-Wall" ]
-
     configs += [ ":endpoint_internal" ]
-
     public_configs = [ ":endpoint_public" ]
     public_deps = [
       "//foundation/communication/ipc/interfaces/innerkits/c/dbinder:dbinder",

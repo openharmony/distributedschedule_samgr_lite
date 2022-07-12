@@ -35,7 +35,6 @@ if (ohos_kernel_type == "liteos_m") {
     ]
 
     public_configs = [ ":samgr_source_public" ]
-    cflags = [ "-Wall" ]
 
     public_deps = [
       "//foundation/distributedschedule/samgr_lite/samgr/adapter:samgr_adapter",

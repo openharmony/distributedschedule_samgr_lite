@@ -28,7 +28,6 @@ if (ohos_kernel_type == "liteos_m") {
       "source/pub_sub_implement.c",
     ]
     public_configs = [ ":broadcast_public" ]
-    cflags = [ "-Wall" ]
     include_dirs = []
   }
 }
