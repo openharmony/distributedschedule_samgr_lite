@@ -21,7 +21,7 @@ if (!enable_ohos_distributedschedule_samgr_lite_rpc_mini) {
       "//foundation/distributedschedule/samgr_lite/interfaces/kits/registry",
       "//utils/native/lite/include",
       "//third_party/bounds_checking_function/include",
-      "//base/security/permission/services/permission_lite/ipc_auth/include",
+      "//base/security/permission_lite/services/ipc_auth/include",
     ]
   }
 
@@ -91,7 +91,7 @@ if (!enable_ohos_distributedschedule_samgr_lite_rpc_mini) {
       "//foundation/distributedschedule/samgr_lite/interfaces/kits/registry",
       "//utils/native/lite/include",
       "//third_party/bounds_checking_function/include",
-      "//base/security/permission/services/permission_lite/ipc_auth/include",
+      "//base/security/permission_lite/services/ipc_auth/include",
     ]
   }
 
@@ -100,8 +100,8 @@ if (!enable_ohos_distributedschedule_samgr_lite_rpc_mini) {
       "./source",
       "../samgr/registry",
       "//foundation/distributedschedule/samgr_lite/samgr_server/source",
-      "//base/security/permission/interfaces/innerkits/permission_lite",
-      "//base/security/permission/services/permission_lite/pms_base/include",
+      "//base/security/permission_lite/interfaces/innerkits",
+      "//base/security/permission_lite/services/pms_base/include",
     ]
   }
 
