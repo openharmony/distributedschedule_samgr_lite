@@ -17,8 +17,8 @@ config("samgr_source_public") {
   include_dirs = [
     "../adapter",
     "../registry",
-    "//foundation/distributedschedule/samgr_lite/interfaces/kits/registry",
-    "//foundation/distributedschedule/samgr_lite/interfaces/kits/samgr",
+    "//foundation/systemabilitymgr/samgr_lite/interfaces/kits/registry",
+    "//foundation/systemabilitymgr/samgr_lite/interfaces/kits/samgr",
     "//utils/native/lite/include",
   ]
 }
@@ -37,13 +37,13 @@ if (ohos_kernel_type == "liteos_m") {
     public_configs = [ ":samgr_source_public" ]
 
     public_deps = [
-      "//foundation/distributedschedule/samgr_lite/samgr/adapter:samgr_adapter",
+      "//foundation/systemabilitymgr/samgr_lite/samgr/adapter:samgr_adapter",
     ]
 
     include_dirs =
         [ "//base/hiviewdfx/hilog_lite/interfaces/native/kits/hilog_lite" ]
 
-    if (enable_ohos_distributedschedule_samgr_lite_rpc_mini) {
+    if (enable_ohos_systemabilitymgr_samgr_lite_rpc_mini) {
       public_deps += [
         "//foundation/communication/ipc/interfaces/innerkits/c/dbinder:dbinder",
       ]
@@ -71,7 +71,7 @@ if (ohos_kernel_type == "liteos_a" || ohos_kernel_type == "linux") {
 
     public_deps = [
       "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
-      "//foundation/distributedschedule/samgr_lite/samgr/adapter:samgr_adapter",
+      "//foundation/systemabilitymgr/samgr_lite/samgr/adapter:samgr_adapter",
     ]
 
     include_dirs = [ "//third_party/bounds_checking_function/include" ]

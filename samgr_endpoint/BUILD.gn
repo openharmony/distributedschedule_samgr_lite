@@ -13,12 +13,12 @@
 
 import("../config.gni")
 
-if (!enable_ohos_distributedschedule_samgr_lite_rpc_mini) {
+if (!enable_ohos_systemabilitymgr_samgr_lite_rpc_mini) {
   config("endpoint_public") {
     include_dirs = [
       "../samgr/adapter",
-      "//foundation/distributedschedule/samgr_lite/interfaces/kits/samgr",
-      "//foundation/distributedschedule/samgr_lite/interfaces/kits/registry",
+      "//foundation/systemabilitymgr/samgr_lite/interfaces/kits/samgr",
+      "//foundation/systemabilitymgr/samgr_lite/interfaces/kits/registry",
       "//utils/native/lite/include",
       "//third_party/bounds_checking_function/include",
       "//base/security/permission_lite/services/ipc_auth/include",
@@ -87,8 +87,8 @@ if (!enable_ohos_distributedschedule_samgr_lite_rpc_mini) {
   config("endpoint_public") {
     include_dirs = [
       "../samgr/adapter",
-      "//foundation/distributedschedule/samgr_lite/interfaces/kits/samgr",
-      "//foundation/distributedschedule/samgr_lite/interfaces/kits/registry",
+      "//foundation/systemabilitymgr/samgr_lite/interfaces/kits/samgr",
+      "//foundation/systemabilitymgr/samgr_lite/interfaces/kits/registry",
       "//utils/native/lite/include",
       "//third_party/bounds_checking_function/include",
       "//base/security/permission_lite/services/ipc_auth/include",
@@ -99,7 +99,7 @@ if (!enable_ohos_distributedschedule_samgr_lite_rpc_mini) {
     include_dirs = [
       "./source",
       "../samgr/registry",
-      "//foundation/distributedschedule/samgr_lite/samgr_server/source",
+      "//foundation/systemabilitymgr/samgr_lite/samgr_server/source",
       "//base/security/permission_lite/interfaces/innerkits",
       "//base/security/permission_lite/services/pms_base/include",
     ]

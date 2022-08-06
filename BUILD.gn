@@ -27,7 +27,7 @@ lite_component("samgr") {
     ]
   }
 
-  if (enable_ohos_distributedschedule_samgr_lite_rpc_mini) {
+  if (enable_ohos_systemabilitymgr_samgr_lite_rpc_mini) {
     features += [
       "samgr_server:server",
       "samgr_client:client",
@@ -51,14 +51,13 @@ ndk_lib("samgr_lite_ndk") {
     "samgr",
   ]
   head_files = [
-    "//foundation/distributedschedule/samgr_lite/interfaces/kits/samgr",
-    "//foundation/distributedschedule/samgr_lite/interfaces/kits/communication/broadcast",
+    "//foundation/systemabilitymgr/samgr_lite/interfaces/kits/samgr",
+    "//foundation/systemabilitymgr/samgr_lite/interfaces/kits/communication/broadcast",
   ]
   if (ohos_kernel_type == "liteos_a" || ohos_kernel_type == "linux") {
     deps += [ "samgr_server:server" ]
-    head_files += [
-      "//foundation/distributedschedule/samgr_lite/interfaces/kits/registry",
-    ]
+    head_files +=
+        [ "//foundation/systemabilitymgr/samgr_lite/interfaces/kits/registry" ]
   }
 }
 

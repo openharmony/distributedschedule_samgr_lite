@@ -1,19 +1,19 @@
 {
-    "name": "@ohos/distributedschedule_samgr_lite",
+    "name": "@ohos/systemabilitymgr_samgr_lite",
     "description": "system ability manager",
     "homePage": "https://gitee.com/openharmony",
     "version": "3.1",
     "license": "Apache License 2.0",
-    "repository": "https://gitee.com/openharmony/distributedschedule_samgr_lite",
+    "repository": "https://gitee.com/openharmony/systemabilitymgr_samgr_lite",
     "publishAs": "code-segment",
     "segment": {
-        "destPath": "foundation/distributedschedule/samgr_lite"
+        "destPath": "foundation/systemabilitymgr/samgr_lite"
     },
     "dirs": {},
     "scripts": {},
     "component": {
         "name": "samgr_lite",
-        "subsystem": "distributedschedule",
+        "subsystem": "systemabilitymgr",
         "adapted_system_type": [
             "small"
         ],
@@ -36,7 +36,7 @@
         },
         "build": {
             "sub_component": [
-                "//foundation/distributedschedule/samgr_lite:samgr"
+                "//foundation/systemabilitymgr/samgr_lite:samgr"
             ]
         }
     }

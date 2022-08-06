@@ -15,9 +15,9 @@ import("../config.gni")
 
 defines = []
 
-if (defined(config_ohos_distributedschedule_samgr_lite_shared_task_size) &&
-    config_ohos_distributedschedule_samgr_lite_shared_task_size > 0) {
-  defines += [ "SHARED_TASK_STACK_SIZE=$config_ohos_distributedschedule_samgr_lite_shared_task_size" ]
+if (defined(config_ohos_systemabilitymgr_samgr_lite_shared_task_size) &&
+    config_ohos_systemabilitymgr_samgr_lite_shared_task_size > 0) {
+  defines += [ "SHARED_TASK_STACK_SIZE=$config_ohos_systemabilitymgr_samgr_lite_shared_task_size" ]
 }
 
 config("external_settings_shared") {
@@ -28,8 +28,8 @@ config("samgr_public") {
   include_dirs = [
     "adapter",
     "registry",
-    "//foundation/distributedschedule/samgr_lite/interfaces/kits/registry",
-    "//foundation/distributedschedule/samgr_lite/interfaces/kits/samgr",
+    "//foundation/systemabilitymgr/samgr_lite/interfaces/kits/registry",
+    "//foundation/systemabilitymgr/samgr_lite/interfaces/kits/samgr",
     "//utils/native/lite/include",
   ]
 }
@@ -47,15 +47,14 @@ if (ohos_kernel_type == "liteos_m") {
         [ "//base/hiviewdfx/hilog_lite/interfaces/native/kits/hilog_lite" ]
 
     public_deps = [
-      "//foundation/distributedschedule/samgr_lite/samgr/adapter:samgr_adapter",
-      "//foundation/distributedschedule/samgr_lite/samgr/source:samgr_source",
+      "//foundation/systemabilitymgr/samgr_lite/samgr/adapter:samgr_adapter",
+      "//foundation/systemabilitymgr/samgr_lite/samgr/source:samgr_source",
     ]
 
-    if (enable_ohos_distributedschedule_samgr_lite_rpc_mini) {
+    if (enable_ohos_systemabilitymgr_samgr_lite_rpc_mini) {
       defines += [ "MINI_SAMGR_LITE_RPC" ]
-      include_dirs += [
-        "//foundation/distributedschedule/samgr_lite/samgr_endpoint/source",
-      ]
+      include_dirs +=
+          [ "//foundation/systemabilitymgr/samgr_lite/samgr_endpoint/source" ]
       public_deps += [
         "//foundation/communication/ipc/interfaces/innerkits/c/dbinder:dbinder",
       ]
@@ -77,14 +76,14 @@ if (ohos_kernel_type == "liteos_a" || ohos_kernel_type == "linux") {
     include_dirs = [
       "//third_party/bounds_checking_function/include",
       "//third_party/cJSON",
-      "//foundation/distributedschedule/samgr_lite/samgr_endpoint/source",
+      "//foundation/systemabilitymgr/samgr_lite/samgr_endpoint/source",
     ]
 
     public_deps = [
       "//build/lite/config/component/cJSON:cjson_shared",
       "//foundation/communication/ipc/interfaces/innerkits/c/ipc:ipc_single",
-      "//foundation/distributedschedule/samgr_lite/samgr/source:samgr_source",
-      "//foundation/distributedschedule/samgr_lite/samgr_client:client",
+      "//foundation/systemabilitymgr/samgr_lite/samgr/source:samgr_source",
+      "//foundation/systemabilitymgr/samgr_lite/samgr_client:client",
     ]
     public_configs += [ ":external_settings_shared" ]
   }

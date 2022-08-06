@@ -13,7 +13,7 @@
 
 import("../config.gni")
 
-if (!enable_ohos_distributedschedule_samgr_lite_rpc_mini) {
+if (!enable_ohos_systemabilitymgr_samgr_lite_rpc_mini) {
   source_set("client") {
     sources = [ "source/remote_register_rpc.c" ]
 
@@ -24,15 +24,15 @@ if (!enable_ohos_distributedschedule_samgr_lite_rpc_mini) {
 
     include_dirs = [
       "../samgr_endpoint/source",
-      "//foundation/distributedschedule/samgr_lite/interfaces/kits/samgr",
-      "//foundation/distributedschedule/samgr_lite/interfaces/kits/registry",
+      "//foundation/systemabilitymgr/samgr_lite/interfaces/kits/samgr",
+      "//foundation/systemabilitymgr/samgr_lite/interfaces/kits/registry",
       "//utils/native/lite/include",
       "//third_party/bounds_checking_function/include",
     ]
 
     public_deps = [
       "//foundation/communication/ipc/interfaces/innerkits/c/ipc:ipc_single",
-      "//foundation/distributedschedule/samgr_lite/samgr_endpoint:endpoint_source",
+      "//foundation/systemabilitymgr/samgr_lite/samgr_endpoint:endpoint_source",
       "//third_party/bounds_checking_function:libsec_shared",
     ]
   }
@@ -44,15 +44,15 @@ if (!enable_ohos_distributedschedule_samgr_lite_rpc_mini) {
     include_dirs = [
       "../samgr_server/source",
       "../samgr_endpoint/source",
-      "//foundation/distributedschedule/samgr_lite/interfaces/kits/samgr",
-      "//foundation/distributedschedule/samgr_lite/interfaces/kits/registry",
+      "//foundation/systemabilitymgr/samgr_lite/interfaces/kits/samgr",
+      "//foundation/systemabilitymgr/samgr_lite/interfaces/kits/registry",
       "//utils/native/lite/include",
       "//third_party/bounds_checking_function/include",
     ]
 
     public_deps = [
       "//foundation/communication/ipc/interfaces/innerkits/c/dbinder:dbinder",
-      "//foundation/distributedschedule/samgr_lite/samgr_endpoint:endpoint_source",
+      "//foundation/systemabilitymgr/samgr_lite/samgr_endpoint:endpoint_source",
       "//third_party/bounds_checking_function:libsec_static",
     ]
   }

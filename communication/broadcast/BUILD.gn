@@ -13,9 +13,9 @@
 
 config("broadcast_public") {
   include_dirs = [
-    "//foundation/distributedschedule/samgr_lite/interfaces/kits/communication/broadcast",
-    "//foundation/distributedschedule/samgr_lite/interfaces/kits/samgr",
-    "//foundation/distributedschedule/samgr_lite/samgr/adapter",
+    "//foundation/systemabilitymgr/samgr_lite/interfaces/kits/communication/broadcast",
+    "//foundation/systemabilitymgr/samgr_lite/interfaces/kits/samgr",
+    "//foundation/systemabilitymgr/samgr_lite/samgr/adapter",
     "//utils/native/lite/include",
   ]
 }
@@ -47,7 +47,7 @@ if (ohos_kernel_type == "liteos_a" || ohos_kernel_type == "linux") {
     ]
     include_dirs = [ "//third_party/bounds_checking_function/include" ]
     public_deps = [
-      "//foundation/distributedschedule/samgr_lite/samgr:samgr",
+      "//foundation/systemabilitymgr/samgr_lite/samgr:samgr",
       "//third_party/bounds_checking_function:libsec_shared",
     ]
   }

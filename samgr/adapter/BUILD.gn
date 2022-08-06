@@ -14,7 +14,7 @@
 config("samgr_adapter_public") {
   include_dirs = [
     "./",
-    "//foundation/distributedschedule/samgr_lite/interfaces/kits/samgr",
+    "//foundation/systemabilitymgr/samgr_lite/interfaces/kits/samgr",
     "//utils/native/lite/include",
   ]
 }
