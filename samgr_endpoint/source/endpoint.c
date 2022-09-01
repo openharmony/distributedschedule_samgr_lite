@@ -123,8 +123,8 @@ int SAMGR_AddRouter(Endpoint *endpoint, const SaName *saName, const Identity *id
 
     Router *router = SAMGR_Malloc(sizeof(Router));
     if (router == NULL) {
-        HILOG_ERROR(HILOG_MODULE_SAMGR, "Memory is not enough! Identity<%d, %d, %p>",
-                    id->serviceId, id->featureId, id->queueId);
+        HILOG_ERROR(HILOG_MODULE_SAMGR, "Memory is not enough! Identity<%d, %d>",
+            id->serviceId, id->featureId);
         return EC_NOMEMORY;
     }
     router->saName = *saName;
@@ -234,7 +234,7 @@ static int32 ParseGetAllSysCapsReply(IpcIo *reply, char sysCaps[MAX_SYSCAP_NUM][
     uint32 size = IpcIoPopUint32(reply);
     size = ((size > MAX_SYSCAP_NUM) ? MAX_SYSCAP_NUM : size);
     int cnt = *sysCapNum;
-    for (int i = 0; i < size; i++) {
+    for (uint32 i = 0; i < size; i++) {
         int len = 0;
         char *sysCap = (char *)IpcIoPopString(reply, &len);
         if (sysCap == NULL || len == 0) {
@@ -423,8 +423,8 @@ static int Dispatch(const IpcContext *context, void *ipcMsg, IpcIo *data, void *
     uint32 *ref = NULL;
     int ret = SAMGR_SendSharedDirectRequest(&router->identity, &request, &resp, &ref, HandleIpc);
     if (ret != EC_SUCCESS) {
-        HILOG_ERROR(HILOG_MODULE_SAMGR, "Router[%u] Service<%d, %d, %p> is busy",
-                    token, router->identity.serviceId, router->identity.featureId, router->identity.queueId);
+        HILOG_ERROR(HILOG_MODULE_SAMGR, "Router[%u] Service<%d, %d> is busy",
+            token, router->identity.serviceId, router->identity.featureId);
         goto ERROR;
     }
 #endif
@@ -447,7 +447,7 @@ static void HandleIpc(const Request *request, const Response *response)
 
     if (router == NULL || router->proxy == NULL || router->proxy->Invoke == NULL) {
         FreeBuffer(endpoint->context, ipcMsg);
-        HILOG_ERROR(HILOG_MODULE_SAMGR, "Invalid IPC router<%p>!", router);
+        HILOG_ERROR(HILOG_MODULE_SAMGR, "Invalid IPC router!");
         return;
     }
 

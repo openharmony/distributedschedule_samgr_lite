@@ -144,8 +144,8 @@ static TaskConfig GetTaskConfig(Service *service)
 static int32 Invoke(IServerProxy *iProxy, int funcId, void *origin, IpcIo *req, IpcIo *reply)
 {
     SamgrServer *server = GET_OBJECT(iProxy, SamgrServer, iUnknown);
-    int32 resource = IpcIoPopUint32(req);
-    int32 option = IpcIoPopUint32(req);
+    uint32_t resource = IpcIoPopUint32(req);
+    uint32_t option = IpcIoPopUint32(req);
     if (server == NULL || resource >= RES_BUTT || resource < 0 || g_functions[resource] == NULL) {
         HILOG_ERROR(HILOG_MODULE_SAMGR, "Invalid Msg<%d, %d, %d>", resource, option, funcId);
         return EC_INVALID;

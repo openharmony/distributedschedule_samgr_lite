@@ -125,7 +125,7 @@ uint32 *SAMGR_SendSharedRequest(const Identity *identity, const Request *request
     exchange.id.queueId = NULL;
     int32 err = SharedSend(identity->queueId, &exchange, 0);
     if (err != EC_SUCCESS) {
-        HILOG_ERROR(HILOG_MODULE_SAMGR, "SharedSend [%p] failed(%d)!", identity->queueId, err);
+        HILOG_ERROR(HILOG_MODULE_SAMGR, "SharedSend failed(%d)!", err);
         (void)FreeReference(&exchange);
     }
     return exchange.sharedRef;
@@ -154,7 +154,7 @@ int32 SAMGR_SendSharedDirectRequest(const Identity *id, const Request *req, cons
     exchange.id.queueId = NULL;
     int32 err = SharedSend(id->queueId, &exchange, 0);
     if (err != EC_SUCCESS) {
-        HILOG_ERROR(HILOG_MODULE_SAMGR, "SharedSend [%p] failed(%d)!", id->queueId, err);
+        HILOG_ERROR(HILOG_MODULE_SAMGR, "SharedSend failed(%d)!", err);
         (void)FreeReference(&exchange);
     }
     *ref = exchange.sharedRef;
