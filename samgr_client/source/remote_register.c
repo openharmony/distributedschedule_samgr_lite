@@ -77,8 +77,7 @@ IUnknown *SAMGR_FindServiceApi(const char *service, const char *feature)
     }
     VECTOR_Add(&g_remoteRegister.clients, proxy);
     MUTEX_Unlock(g_remoteRegister.mtx);
-    HILOG_INFO(HILOG_MODULE_SAMGR, "Create remote sa proxy[%p]<%s, %s>!",
-               proxy, service, feature);
+    HILOG_INFO(HILOG_MODULE_SAMGR, "Create remote sa proxy<%s, %s>!", service, feature);
     return proxy;
 }
 
