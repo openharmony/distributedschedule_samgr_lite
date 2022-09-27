@@ -1,4 +1,7 @@
-# 介绍<a name="ZH-CN_TOPIC_0000001081604584"></a>
+公告：
+因OpenHarmony部件设计规范化需求，2022.08月起distributedschedule_samgr_lite仓库更名为systemabilitymgr_samgr_lite，本仓库归档不在维护。
+请前往[**systemabilitymgr\_samgr_lite**](https://gitee.com/openharmony/systemabilitymgr_samgr_lite)仓库，了解最新代码信息
+# 轻量级系统服务管理部件<a name="ZH-CN_TOPIC_0000001081604584"></a>
 
 -   [简介](#section11660541593)
 -   [目录](#section1464106163817)
@@ -10,7 +13,7 @@
 -   [开发跨进程间对外接口](#section9220246194615)
 -   [调用跨进程间服务](#section114372711475)
 -   [开发跨进程间服务调用客户端代理](#section09341923114710)
--   [涉及仓](#section10365113863719)
+-   [相关仓](#section10365113863719)
 
 ## 简介<a name="section11660541593"></a>
 
@@ -24,7 +27,10 @@
 -   M核：包含服务开发、服务的子功能开发、对外接口的开发以及多服务共进程的开发框架。
 -   A核：在M核能力基础之上，包含了进程间服务调用、进程间服务调用权限控制、进程间服务接口的开发等能力。
 
-面向服务的架构：
+## 系统架构<a name="section342962219551"></a>
+
+**图 1**  面向服务的架构
+
 
 ![](figures/zh-cn_image_0000001128146921.png)
 
@@ -32,7 +38,7 @@
 -   Consumer：服务的消费者，调用服务提供的功能（对外接口）。
 -   Samgr：作为中介者，管理Provider提供的能力，同时帮助Consumer发现Provider的能力。
 
-系统服务开发框架主体对象：
+**图 2**  系统服务开发框架主体对象
 
 ![](figures/zh-cn_image_0000001081285004.png)
 
@@ -625,9 +631,15 @@
     ```
 
 
-## 涉及仓<a name="section10365113863719"></a>
+## 相关仓<a name="section10365113863719"></a>
 
-分布式任务调度子系统
+系统服务管理子系统
 
-**samgr\_lite**
+[distributedschedule\_safwk](https://gitee.com/openharmony/distributedschedule_safwk)
+
+[distributedschedule\_samgr](https://gitee.com/openharmony/distributedschedule_samgr)
+
+[distributedschedule\_safwk\_lite](https://gitee.com/openharmony/distributedschedule_safwk_lite)
+
+[**distributedschedule\_samgr\_lite**](https://gitee.com/openharmony/distributedschedule_samgr_lite)
 
