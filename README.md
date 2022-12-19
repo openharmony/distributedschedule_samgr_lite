@@ -1,121 +1,70 @@
-# samgr\_lite<a name="EN-US_TOPIC_0000001081604584"></a>
+**NOTICE**:
+The distributedschedule_samgr_lite repository is renamed systemabilitymgr_samgr_lite since August 2022. The distributedschedule_samgr_lite repository is archived and no longer maintained.
+To obtain the latest code, go to [**systemabilitymgr\_samgr_lite**](https://gitee.com/openharmony/systemabilitymgr_samgr_lite).
+# samgr_lite
 
--   [Introduction](#section11660541593)
--   [Directory Structure](#section1464106163817)
--   [Constraints](#section1718733212019)
--   [Developing a Service](#section159991817144514)
--   [Developing a Feature of a Service](#section11510542164514)
--   [Developing an External API for Intra-Process Communication](#section1685211117463)
--   [Invoking a Service in the Same Process](#section3690162916462)
--   [Developing an External API for IPC](#section9220246194615)
--   [Invoking a Service in Another Process](#section114372711475)
--   [Developing a Client Proxy for Inter-Process Service Invocation](#section09341923114710)
--   [Repositories Involved](#section10365113863719)
 
-## Introduction<a name="section11660541593"></a>
+## Introduction
 
-Due to limited platform resources, a unified system ability \(SA\) framework is provided to harmonize differences of hardware architectures \(for example, RISC-V, Cortex-M, and Cortex-A\), resources, and running modes. Two types of hardware platforms \(M- and A-core\) are defined.
+Due to limited platform resources, a unified system ability (SA) framework is provided to shield differences of hardware architectures (for example, RISC-V, Cortex-M, and Cortex-A), platform resources, and running modes. OpenHarmony provides the following types of kernels:
 
--   M-core: hardware platforms with Cortex-M or equivalent processing capabilities. The system memory is generally less than 512 KB. There is only a lightweight file system that can be used in limited scenarios, or no file system at all. M-core platforms comply with the Cortex Microcontroller Software Interface Standard \(CMSIS\).
--   A-core: hardware platforms with Cortex-A or equivalent processing capabilities. The system memory is greater than 512 KB. There is a comprehensive file system for storing a large amount of data. A-core platforms comply with the Portable Operating System Interface \(POSIX\) specifications.
+-   LiteOS-M: supports devices with Cortex-M or processor with equivalent processing capabilities, system memory less than 512 KiB, and a lightweight file system or no file system. The LiteOS-M kernel complies with the Cortex Microcontroller Software Interface Standard (CMSIS).
+-   LiteOS-A: supports devices with Cortex-A or process with equivalent processing capabilities, system memory greater than 512 KiB, and a file system for storing a large amount of data. The LiteOS-A kernel complies with the Portable Operating System Interface (POSIX) specifications.
 
-This service-oriented SA framework enables you to develop services, features, and external APIs, and implement multi-service process sharing and service invoking for inter-process communication \(IPC\). Wherein:
+This service-oriented SA framework enables you to develop services, features, and external APIs, run multiple services in the same process, and implement service invocation over inter-process communication (IPC). In the system ability framework:
 
--   M core provides services, features, external APIs, and multi-service process sharing development.
--   In addition to the capabilities provided by M-core, A-core provides capabilities such as IPC service invoking, permission control for IPC service invoking, and IPC service API development.
+-   LiteOS-A provides the framework for developing services, features, external APIs, and run multiple services in the same process.
+-   LiteOS-M provides capabilities such as inter-process service invocation, permission control, and service API development.
 
-Service-oriented architecture
+## System Architecture
+
+**Figure 1** Service-oriented architecture
+
 
 ![](figures/en-us_image_0000001128146921.png)
 
--   Provider: a service provider that provides capabilities \(external APIs\) for the system
--   Consumer: a service consumer that invokes the features \(external APIs\) provided by the service
--   Samgr: an agency that manages capabilities provided by providers and helps consumers discover providers' capabilities
+-   Provider: a service provider that provides capabilities (external APIs) for the system.
+-   Consumer: a service consumer that invokes the features (external APIs) provided by the service.
+-   Samgr: an agency that manages capabilities provided by providers and helps consumers discover providers' capabilities.
 
-Main objects of the SA framework:
+**Figure 2** Objects of the SA framework
 
 ![](figures/en-us_image_0000001081285004.png)
 
 -   SamgrLite: provides service registration and discovery.
 -   Service: implements lifecycle APIs of the service during service development.
 -   Feature: implements lifecycle APIs of the feature during feature development.
--   IUnknown: implements external APIs for services or features based on  **IUnknown**.
+-   IUnknown: implements external APIs for services or features based on **IUnknown**.
 -   IClientProxy: implements the consumer's proxy to send messages during IPC invoking.
 -   IServerProxy: implements the provider's proxy during IPC invoking, which needs to be implemented by developers.
 
-## Directory Structure<a name="section1464106163817"></a>
+## Directory Structure
 
-**Table  1**  Structure of the source code directory of the SA framework
+**Figure 1** Structure of the source code directory of the SA framework
 
-<a name="table2977131081412"></a>
-<table><thead align="left"><tr id="row7977610131417"><th class="cellrowborder" valign="top" width="31.3%" id="mcps1.2.3.1.1"><p id="p18792459121314"><a name="p18792459121314"></a><a name="p18792459121314"></a>Directory</p>
-</th>
-<th class="cellrowborder" valign="top" width="68.7%" id="mcps1.2.3.1.2"><p id="p77921459191317"><a name="p77921459191317"></a><a name="p77921459191317"></a>Description</p>
-</th>
-</tr>
-</thead>
-<tbody><tr id="row17977171010144"><td class="cellrowborder" valign="top" width="31.3%" headers="mcps1.2.3.1.1 "><p id="p2793159171311"><a name="p2793159171311"></a><a name="p2793159171311"></a>interfaces/kits/samgr_lite/samgr</p>
-</td>
-<td class="cellrowborder" valign="top" width="68.7%" headers="mcps1.2.3.1.2 "><p id="p879375920132"><a name="p879375920132"></a><a name="p879375920132"></a>External APIs of the M- and A-core SA frameworks</p>
-</td>
-</tr>
-<tr id="row6978161091412"><td class="cellrowborder" valign="top" width="31.3%" headers="mcps1.2.3.1.1 "><p id="p37931659101311"><a name="p37931659101311"></a><a name="p37931659101311"></a>interfaces/kits/samgr_lite/registry</p>
-</td>
-<td class="cellrowborder" valign="top" width="68.7%" headers="mcps1.2.3.1.2 "><p id="p6793059171318"><a name="p6793059171318"></a><a name="p6793059171318"></a>External APIs for service invocation between A-core processes</p>
-</td>
-</tr>
-<tr id="row6978201031415"><td class="cellrowborder" valign="top" width="31.3%" headers="mcps1.2.3.1.1 "><p id="p117935599130"><a name="p117935599130"></a><a name="p117935599130"></a>interfaces/kits/samgr_lite/communication/broadcast</p>
-</td>
-<td class="cellrowborder" valign="top" width="68.7%" headers="mcps1.2.3.1.2 "><p id="p0793185971316"><a name="p0793185971316"></a><a name="p0793185971316"></a>External APIs of the event broadcast service within M- and A-core processes</p>
-</td>
-</tr>
-<tr id="row124243183397"><td class="cellrowborder" valign="top" width="31.3%" headers="mcps1.2.3.1.1 "><p id="p104249183396"><a name="p104249183396"></a><a name="p104249183396"></a>services/samgr_lite/samgr/adapter</p>
-</td>
-<td class="cellrowborder" valign="top" width="68.7%" headers="mcps1.2.3.1.2 "><p id="p2424318203914"><a name="p2424318203914"></a><a name="p2424318203914"></a>POSIX and CMSIS interface adaptation layer, which is used to harmonize the differences between the APIs of M- and A-core</p>
-</td>
-</tr>
-<tr id="row1634915717405"><td class="cellrowborder" valign="top" width="31.3%" headers="mcps1.2.3.1.1 "><p id="p193493571406"><a name="p193493571406"></a><a name="p193493571406"></a>services/samgr_lite/samgr/registry</p>
-</td>
-<td class="cellrowborder" valign="top" width="68.7%" headers="mcps1.2.3.1.2 "><p id="p14349257184012"><a name="p14349257184012"></a><a name="p14349257184012"></a>Stub functions for M-core service registration and discovery</p>
-</td>
-</tr>
-<tr id="row1385432741312"><td class="cellrowborder" valign="top" width="31.3%" headers="mcps1.2.3.1.1 "><p id="p1485582714135"><a name="p1485582714135"></a><a name="p1485582714135"></a>services/samgr_lite/samgr/source</p>
-</td>
-<td class="cellrowborder" valign="top" width="68.7%" headers="mcps1.2.3.1.2 "><p id="p085522751319"><a name="p085522751319"></a><a name="p085522751319"></a>Basic code for the M- and A-core SA frameworks</p>
-</td>
-</tr>
-<tr id="row7968155877"><td class="cellrowborder" valign="top" width="31.3%" headers="mcps1.2.3.1.1 "><p id="p89681851717"><a name="p89681851717"></a><a name="p89681851717"></a>services/samgr_lite/samgr_client</p>
-</td>
-<td class="cellrowborder" valign="top" width="68.7%" headers="mcps1.2.3.1.2 "><p id="p169681051873"><a name="p169681051873"></a><a name="p169681051873"></a>Registration and discovery for service invocation between A-core processes</p>
-</td>
-</tr>
-<tr id="row18291912179"><td class="cellrowborder" valign="top" width="31.3%" headers="mcps1.2.3.1.1 "><p id="p1729111214715"><a name="p1729111214715"></a><a name="p1729111214715"></a>services/samgr_lite/samgr_server</p>
-</td>
-<td class="cellrowborder" valign="top" width="68.7%" headers="mcps1.2.3.1.2 "><p id="p7839893352"><a name="p7839893352"></a><a name="p7839893352"></a>IPC address management and access control for service invocation between A-core processes</p>
-</td>
-</tr>
-<tr id="row6971514279"><td class="cellrowborder" valign="top" width="31.3%" headers="mcps1.2.3.1.1 "><p id="p1797118141671"><a name="p1797118141671"></a><a name="p1797118141671"></a>services/samgr_lite/samgr_endpoint</p>
-</td>
-<td class="cellrowborder" valign="top" width="68.7%" headers="mcps1.2.3.1.2 "><p id="p597119145716"><a name="p597119145716"></a><a name="p597119145716"></a>Packet RX/TX management for A-core IPC</p>
-</td>
-</tr>
-<tr id="row33121991272"><td class="cellrowborder" valign="top" width="31.3%" headers="mcps1.2.3.1.1 "><p id="p143121991875"><a name="p143121991875"></a><a name="p143121991875"></a>services/samgr_lite/communication/broadcast</p>
-</td>
-<td class="cellrowborder" valign="top" width="68.7%" headers="mcps1.2.3.1.2 "><p id="p16312169179"><a name="p16312169179"></a><a name="p16312169179"></a>Event broadcast service for M- and A-core processes</p>
-</td>
-</tr>
-</tbody>
-</table>
+| Directory                                              | Description                                        |
+| -------------------------------------------------- | -------------------------------------------- |
+| interfaces/kits/samgr_lite/samgr                   | External APIs of the LiteOS-M and LiteOS-A SA frameworks.          |
+| interfaces/kits/samgr_lite/registry                | External APIs for service invocation between LiteOS-A processes.           |
+| interfaces/kits/samgr_lite/communication/broadcast | External APIs of the event broadcast service within LiteOS-M and LiteOS-A processes.  |
+| services/samgr_lite/samgr/adapter                  | POSIX and CMSIS interface adaptation layer, which is used to shield the differences between the APIs of LiteOS-M and LiteOS-A.|
+| services/samgr_lite/samgr/registry                 | Stub functions for LiteOS-M service registration and discovery.                   |
+| services/samgr_lite/samgr/source                   | Basic code for the LiteOS-M and LiteOS-A SA frameworks.          |
+| services/samgr_lite/samgr_client                   | Registration and discovery for service invocation between LiteOS-A processes.             |
+| services/samgr_lite/samgr_server                   | IPC address management and access control for service invocation between LiteOS-A processes.  |
+| services/samgr_lite/samgr_endpoint                 | Packet Rx/Tx management for LiteOS-A IPC.                  |
+| services/samgr_lite/communication/broadcast        | Event broadcast service for LiteOS-M and LiteOS-A processes.                |
+|                                                    |                                              |
 
-## Constraints<a name="section1718733212019"></a>
+## Constraints
 
--   The SA framework is developed using the C programming language.
--   Services in the same process use  **IUnknown**  for invoking. Messages are passed to the service through  **IUnknown**.
--   The service name and feature name must be constant character strings and the length must be less than 16 bytes.
--   More-core depends on the Bootstrap service and calls the  **OHOS\_SystemInit\(\)**  function in the system startup function.
--   A-core depends on the Samgr library and calls the  **SAMGR\_Bootstrap\(\)**  function in the  **main**  function.
+-   The SA framework is developed in the C programming language.
+-   Services in the same process use **IUnknown** for invoking. Messages are passed to the service through **IUnknown**.
+-   The service name and feature name must be constant strings and the length must be less than 16 bytes.
+-   More-core depends on the Bootstrap service and calls the **OHOS_SystemInit()** function in the system startup function.
+-   LiteOS-A depends on the Samgr library and calls the **SAMGR_Bootstrap()** function in the **main** function.
 
-## Developing a Service<a name="section159991817144514"></a>
+## Developing a Service
 
 -   Inherit and redefine a service.
 
@@ -194,7 +143,7 @@ Main objects of the SA framework:
     ```
 
 
-## Developing a Feature of a Service<a name="section11510542164514"></a>
+## Developing a Feature of a Service
 
 -   Inherit and redefine a feature.
 
@@ -286,9 +235,9 @@ Main objects of the SA framework:
     ```
 
 
-## Developing an External API for Intra-Process Communication<a name="section1685211117463"></a>
+## Developing an External API for Intra-Process Communication
 
--   Define the  **IUnknown**  API.
+-   Define the **IUnknown** API.
 
     ```
     typedef struct DemoApi {
@@ -300,7 +249,7 @@ Main objects of the SA framework:
     } DemoApi;
     ```
 
--   Define the reference object of  **IUnknown**.
+-   Define the reference object of **IUnknown**.
 
     ```
     typedef struct DemoRefApi {
@@ -308,7 +257,7 @@ Main objects of the SA framework:
     } DemoRefApi;
     ```
 
--   Initialize the object of  **IUnknown**.
+-   Initialize the object of **IUnknown**.
 
     ```
     static DemoRefApi api = {
@@ -329,7 +278,7 @@ Main objects of the SA framework:
     ```
 
 
-## Invoking a Service in the Same Process<a name="section3690162916462"></a>
+## Invoking a Service in the Same Process
 
 -   Obtain the external API of the service.
 
@@ -362,9 +311,9 @@ Main objects of the SA framework:
     ```
 
 
-## Developing an External API for IPC<a name="section9220246194615"></a>
+## Developing an External API for IPC
 
--   Inherit  **IServerProxy**  to replace  **IUnknown**: INHERIT\_SERVER\_IPROXY
+-   Inherit **IServerProxy** to replace **IUnknown**: INHERIT\_SERVER\_IPROXY
 
     ```
     typedef struct DemoFeatureApi {
@@ -376,7 +325,7 @@ Main objects of the SA framework:
     } DemoFeatureApi;
     ```
 
--   Initialize the  **IServerProxy**  object.
+-   Initialize the **IServerProxy** object.
 
     ```
     static DemoFeature g_example = {
@@ -390,7 +339,7 @@ Main objects of the SA framework:
     };
     ```
 
--   Implement the  **Invoke**  function to process IPC messages.
+-   Implement the **Invoke** function to process IPC messages.
 
     ```
     static int32 Invoke(IServerProxy *iProxy, int funcId, void *origin, IpcIo *req, IpcIo *reply)
@@ -437,7 +386,7 @@ Main objects of the SA framework:
     ```
 
 
-## Invoking a Service in Another Process<a name="section114372711475"></a>
+## Invoking a Service in Another Process
 
 -   Obtain the external API of the service in another process.
 
@@ -469,7 +418,7 @@ Main objects of the SA framework:
     ```
 
 
-## Developing a Client Proxy for Inter-Process Service Invocation<a name="section09341923114710"></a>
+## Developing a Client Proxy for Inter-Process Service Invocation
 
 -   Define a client proxy for the IPC API.
 
@@ -625,9 +574,14 @@ Main objects of the SA framework:
     ```
 
 
-## Repositories Involved<a name="section10365113863719"></a>
+## Repositories Involved
 
-Distributed Scheduler subsystem
+Samgr_lite
 
-**samgr\_lite**
+[distributedschedule\_safwk](https://gitee.com/openharmony/distributedschedule_safwk)
 
+[distributedschedule\_samgr](https://gitee.com/openharmony/distributedschedule_samgr)
+
+[distributedschedule\_safwk\_lite](https://gitee.com/openharmony/distributedschedule_safwk_lite)
+
+[**distributedschedule\_samgr\_lite**](https://gitee.com/openharmony/distributedschedule_samgr_lite)
